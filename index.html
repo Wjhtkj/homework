@@ -207,6 +207,13 @@
 
             // 从 localStorage 中获取保存的名字
             var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
+            var isLeaderMode = JSON.parse(localStorage.getItem("isLeaderMode")) || false;
+
+            if (isLeaderMode) {
+                selectedValues = selectedValues.map(value => 
+                    value.replace(/物理/g, "语文").replace(/化学/g, "数学").replace(/生物/g, "英语")
+                );
+            }
 
             // 分割选项值为6行，每行3个选项
             var lines = [];
@@ -227,6 +234,9 @@
             outputText.setSelectionRange(0, 99999); // 适用于移动设备
             document.execCommand("copy");
             alert("文本已复制到剪切板");
+            
+            // 尝试打开微信
+            window.location.href = "weixin://";
         }
 
         function fetchBingWallpaper() {
@@ -261,8 +271,13 @@
             var darkModeEnabled = document.getElementById("darkModeToggle").checked;
             localStorage.setItem("darkMode", darkModeEnabled);
 
+            // 保存组长模式设置
+            var isLeaderMode = document.getElementById("leaderModeToggle").checked;
+            localStorage.setItem("isLeaderMode", isLeaderMode);
+
             updateLabels(names);
             applyDarkMode(darkModeEnabled);
+            applyLeaderMode(isLeaderMode);
             closeSettingsModal();
             alert("设置已保存");
         }
@@ -282,7 +297,21 @@
                 document.body.classList.remove("dark-mode");
             }
         }
-
+        // 应用组长模式
+        function applyLeaderMode(enabled) {
+            var selects = document.getElementsByClassName("options");
+            for (var i = 0; i < selects.length; i++) {
+                for (var j = 0; j < selects[i].options.length; j++) {
+                    if (enabled) {
+                        selects[i].options[j].text = selects[i].options[j].text.replace(/物理/g, "语文").replace(/化学/g, "数学").replace(/生物/g, "英语");
+                        selects[i].options[j].value = selects[i].options[j].value.replace(/物理/g, "语文").replace(/化学/g, "数学").replace(/生物/g, "英语");
+                    } else {
+                        selects[i].options[j].text = selects[i].options[j].text.replace(/语文/g, "物理").replace(/数学/g, "化学").replace(/英语/g, "生物");
+                        selects[i].options[j].value = selects[i].options[j].value.replace(/语文/g, "物理").replace(/数学/g, "化学").replace(/英语/g, "生物");
+                    }
+                }
+            }
+        }
         // 加载设置
         function loadSettings() {
             fetchBingWallpaper();
@@ -296,6 +325,11 @@
             var darkModeEnabled = JSON.parse(localStorage.getItem("darkMode")) || false;
             document.getElementById("darkModeToggle").checked = darkModeEnabled;
             applyDarkMode(darkModeEnabled);
+
+            // 加载组长模式设置
+            var isLeaderMode = JSON.parse(localStorage.getItem("isLeaderMode")) || false;
+            document.getElementById("leaderModeToggle").checked = isLeaderMode;
+            applyLeaderMode(isLeaderMode);
         }
 
         window.onload = loadSettings;
@@ -434,6 +468,10 @@
             <label>
                 <input type="checkbox" id="darkModeToggle">
                 暗黑模式
+            </label>
+            <label>
+                <input type="checkbox" id="leaderModeToggle">
+                组长模式
             </label>
             <button onclick="saveSettings()">保存</button>
         </div>
