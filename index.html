@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业检查</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            position: relative; /* 添加相对定位以便页脚绝对定位 */
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            overflow-y: auto;
+            height: 90vh;
+        }
+        .options-container {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        select {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 100%;
+            margin-top: 20px;
+            box-sizing: border-box;
+            height: 100px; /* 调整文本区域高度 */
+        }
+
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+            .container {
+                padding: 15px;
+                height: 90vh;
+            }
+            button, select, textarea {
+                padding: 10px;
+                margin: 5px 0;
+            }
+            label {
+                margin-bottom: 5px;
+            }
+        }
+
+        /* 页脚样式 */
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #333;
+        }
+        .footer a {
+            text-decoration: underline;
+            color: #007BFF;
+        }
+        .footer a:hover {
+            text-decoration: none;
+        }
+
+        /* 设置按钮样式 */
+        .settings-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .settings-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        .modal button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 暗黑模式样式 */
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        body.dark-mode .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+        }
+
+        body.dark-mode .footer {
+            color: #ffffff;
+        }
+
+        body.dark-mode .footer a {
+            color: #007BFF;
+        }
+
+        body.dark-mode .settings-button {
+            background-color: #4CAF50;
+        }
+
+        body.dark-mode .modal {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #1f1f1f;
+            color: #ffffff;
+        }
+
+        body.dark-mode .modal input[type="text"] {
+            background-color: #333;
+            color: #ffffff;
+        }
+
+        body.dark-mode .modal button {
+            background-color: #4CAF50;
+        }
+    </style>
+    <script>
+        function showSelectedOptions() {
+            var options = document.getElementsByClassName("options");
+            var selectedValues = Array.from(options).map(option => option.value);
+            var currentDate = new Date();
+            var formattedDate = currentDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+            // 从 localStorage 中获取保存的名字
+            var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
+
+            // 分割选项值为6行，每行3个选项
+            var lines = [];
+            for (let i = 0; i < selectedValues.length; i += 3) {
+                lines.push(selectedValues.slice(i, i + 3).join(" "));
+            }
+
+            // 每行前加上对应的名字
+            var formattedOutput = lines.map((line, index) => `${savedNames[index]}：${line}`).join("\n");
+
+            var outputText = document.getElementById("outputText");
+            outputText.value = `${formattedDate} 第一小组物化生作业检查\n${formattedOutput}`;
+        }
+
+        function copyToClipboard() {
+            var outputText = document.getElementById("outputText");
+            outputText.select();
+            outputText.setSelectionRange(0, 99999); // 适用于移动设备
+            document.execCommand("copy");
+            alert("文本已复制到剪切板");
+        }
+
+        function fetchBingWallpaper() {
+            fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN')
+                .then(response => response.json())
+                .then(data => {
+                    var imageUrl = 'https://www.bing.com' + data.images[0].url;
+                    document.body.style.backgroundImage = `url(${imageUrl})`;
+                })
+                .catch(error => console.error('Error fetching Bing wallpaper:', error));
+        }
+
+        // 设置按钮点击事件
+        function openSettingsModal() {
+            document.getElementById("settingsModal").style.display = "block";
+        }
+
+        // 关闭模态框
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+
+        // 保存设置
+        function saveSettings() {
+            var names = [];
+            for (let i = 1; i <= 6; i++) {
+                names.push(document.getElementById(`name${i}`).value);
+            }
+            localStorage.setItem("names", JSON.stringify(names));
+
+            // 保存暗黑模式设置
+            var darkModeEnabled = document.getElementById("darkModeToggle").checked;
+            localStorage.setItem("darkMode", darkModeEnabled);
+
+            updateLabels(names);
+            applyDarkMode(darkModeEnabled);
+            closeSettingsModal();
+            alert("设置已保存");
+        }
+
+        // 更新标签
+        function updateLabels(names) {
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`label${i}`).textContent = `${names[i - 1]}:`; 
+            }
+        }
+
+        // 应用暗黑模式
+        function applyDarkMode(enabled) {
+            if (enabled) {
+                document.body.classList.add("dark-mode");
+            } else {
+                document.body.classList.remove("dark-mode");
+            }
+        }
+
+        // 加载设置
+        function loadSettings() {
+            fetchBingWallpaper();
+            var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`name${i}`).value = savedNames[i - 1];
+            }
+            updateLabels(savedNames);
+
+            // 加载暗黑模式设置
+            var darkModeEnabled = JSON.parse(localStorage.getItem("darkMode")) || false;
+            document.getElementById("darkModeToggle").checked = darkModeEnabled;
+            applyDarkMode(darkModeEnabled);
+        }
+
+        window.onload = loadSettings;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>作业检查</h1>
+        <div class="options-container">
+            <div>
+                <label id="label1">1:</label>
+                <select class="options">
+                    <option value="物理作业完成良好">物理作业完成良好</option>
+                    <option value="物理作业未订正">物理作业未订正</option>
+                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="化学作业完成良好">化学作业完成良好</option>
+                    <option value="化学作业未订正">化学作业未订正</option>
+                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="生物作业完成良好">生物作业完成良好</option>
+                    <option value="生物作业未订正">生物作业未订正</option>
+                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
+                </select>
+            </div>
+            <div>
+                <label id="label2">2:</label>
+                <select class="options">
+                    <option value="物理作业完成良好">物理作业完成良好</option>
+                    <option value="物理作业未订正">物理作业未订正</option>
+                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="化学作业完成良好">化学作业完成良好</option>
+                    <option value="化学作业未订正">化学作业未订正</option>
+                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="生物作业完成良好">生物作业完成良好</option>
+                    <option value="生物作业未订正">生物作业未订正</option>
+                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
+                </select>
+            </div>
+            <div>
+                <label id="label3">3:</label>
+                <select class="options">
+                    <option value="物理作业完成良好">物理作业完成良好</option>
+                    <option value="物理作业未订正">物理作业未订正</option>
+                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="化学作业完成良好">化学作业完成良好</option>
+                    <option value="化学作业未订正">化学作业未订正</option>
+                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="生物作业完成良好">生物作业完成良好</option>
+                    <option value="生物作业未订正">生物作业未订正</option>
+                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
+                </select>
+            </div>
+            <div>
+                <label id="label4">4:</label>
+                <select class="options">
+                    <option value="物理作业完成良好">物理作业完成良好</option>
+                    <option value="物理作业未订正">物理作业未订正</option>
+                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="化学作业完成良好">化学作业完成良好</option>
+                    <option value="化学作业未订正">化学作业未订正</option>
+                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="生物作业完成良好">生物作业完成良好</option>
+                    <option value="生物作业未订正">生物作业未订正</option>
+                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
+                </select>
+            </div>
+            <div>
+                <label id="label5">5:</label>
+                <select class="options">
+                    <option value="物理作业完成良好">物理作业完成良好</option>
+                    <option value="物理作业未订正">物理作业未订正</option>
+                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="化学作业完成良好">化学作业完成良好</option>
+                    <option value="化学作业未订正">化学作业未订正</option>
+                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="生物作业完成良好">生物作业完成良好</option>
+                    <option value="生物作业未订正">生物作业未订正</option>
+                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
+                </select>
+            </div>
+            <div>
+                <label id="label6">6:</label>
+                <select class="options">
+                    <option value="物理作业完成良好">物理作业完成良好</option>
+                    <option value="物理作业未订正">物理作业未订正</option>
+                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="化学作业完成良好">化学作业完成良好</option>
+                    <option value="化学作业未订正">化学作业未订正</option>
+                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
+                </select>
+                <select class="options">
+                    <option value="生物作业完成良好">生物作业完成良好</option>
+                    <option value="生物作业未订正">生物作业未订正</option>
+                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="showSelectedOptions()">确定</button>
+        <textarea id="outputText" rows="10" cols="50" readonly></textarea>
+        <button onclick="copyToClipboard()">复制</button>
+    </div>
+    <!-- 设置按钮 -->
+    <button class="settings-button" onclick="openSettingsModal()">设置</button>
+    <!-- 模态框 -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettingsModal()">&times;</span>
+            <h2>设置</h2>
+            <input type="text" id="name1" placeholder="姓名1">
+            <input type="text" id="name2" placeholder="姓名2">
+            <input type="text" id="name3" placeholder="姓名3">
+            <input type="text" id="name4" placeholder="姓名4">
+            <input type="text" id="name5" placeholder="姓名5">
+            <input type="text" id="name6" placeholder="姓名6">
+            <label>
+                <input type="checkbox" id="darkModeToggle">
+                暗黑模式
+            </label>
+            <button onclick="saveSettings()">保存</button>
+        </div>
+    </div>
+    <!-- 页脚 -->
+    <div class="footer">
+        Made by 无际航天 <a href="https://wjhtkjwz.eu.org/" target="_blank">去我的博客看看吧</a>
+    </div>
+</body>
+</html>
