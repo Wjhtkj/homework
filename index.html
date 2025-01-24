@@ -11,8 +11,6 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-size: cover;
-            background-position: center;
             font-family: Arial, sans-serif;
             position: relative; /* 添加相对定位以便页脚绝对定位 */
         }
@@ -197,6 +195,7 @@
         body.dark-mode .modal button {
             background-color: #4CAF50;
         }
+
     </style>
     <script>
         function showSelectedOptions() {
@@ -207,25 +206,95 @@
 
             // 从 localStorage 中获取保存的名字
             var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
-            var isLeaderMode = JSON.parse(localStorage.getItem("isLeaderMode")) || false;
 
-            if (isLeaderMode) {
-                selectedValues = selectedValues.map(value => 
-                    value.replace(/物理/g, "语文").replace(/化学/g, "数学").replace(/生物/g, "英语")
-                );
+            // 根据组长模式状态调整学科名称
+            var leaderModeEnabled = JSON.parse(localStorage.getItem("leaderMode")) || false;
+            var subjectMap = {
+                物理: leaderModeEnabled ? "语文" : "物理",
+                化学: leaderModeEnabled ? "数学" : "化学",
+                生物: leaderModeEnabled ? "英语" : "生物"
+            };
+
+            // 创建一个对象来存储每个学科的选项
+            var subjectOptions = {
+                物理: [],
+                化学: [],
+                生物: []
+            };
+
+            if (leaderModeEnabled) {
+                subjectOptions = {
+                    语文: [],
+                    数学: [],
+                    英语: []
+                };
             }
 
-            // 分割选项值为6行，每行3个选项
-            var lines = [];
-            for (let i = 0; i < selectedValues.length; i += 3) {
-                lines.push(selectedValues.slice(i, i + 3).join(" "));
-            }
+            // 将选项分配到对应的学科数组中，并去除学科名称和“作业”二字
+            selectedValues.forEach((value, index) => {
+                let subject;
+                if (value.includes("物理")) {
+                    subject = "物理";
+                } else if (value.includes("化学")) {
+                    subject = "化学";
+                } else if (value.includes("生物")) {
+                    subject = "生物";
+                }
 
-            // 每行前加上对应的名字
-            var formattedOutput = lines.map((line, index) => `${savedNames[index]}：${line}`).join("\n");
+                // 去除“作业”二字和学科名称
+                let cleanedValue = value.replace(/(物理|化学|生物)作业/g, "").trim();
+
+                subjectOptions[subjectMap[subject]].push(`${savedNames[Math.floor(index / 3)]} ${cleanedValue}`);
+            });
+
+            // 按学科顺序拼接输出字符串
+            var formattedOutput = [
+                `${subjectMap["物理"]}: ${subjectOptions[subjectMap["物理"]].join(", ")}`,
+                `${subjectMap["化学"]}: ${subjectOptions[subjectMap["化学"]].join(", ")}`,
+                `${subjectMap["生物"]}: ${subjectOptions[subjectMap["生物"]].join(", ")}`.replace("undefined", "")
+            ].join("\n");
+
+            // 从 localStorage 中获取保存的组别
+            var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
 
             var outputText = document.getElementById("outputText");
-            outputText.value = `${formattedDate} 第一小组物化生作业检查\n${formattedOutput}`;
+            outputText.value = `${formattedDate} 第${groupSelected}小组${leaderModeEnabled ? "语数英" : "物化生"}作业检查\n${formattedOutput}`;
+        }
+
+        function applyLeaderMode(enabled) {
+            if (enabled) {
+                document.querySelectorAll('label[id^="label"]').forEach(label => {
+                    label.textContent = label.textContent.replace(/物理|化学|生物/g, function(match) {
+                        return match === '物理' ? '语文' : match === '化学' ? '数学' : '英语';
+                    });
+                });
+
+                document.querySelectorAll('select.options option').forEach(option => {
+                    option.textContent = option.textContent.replace(/物理|化学|生物/g, function(match) {
+                        return match === '物理' ? '语文' : match === '化学' ? '数学' : '英语';
+                    });
+                });
+
+                document.getElementById('outputText').value = document.getElementById('outputText').value.replace(/物理|化学|生物|物化生/g, function(match) {
+                    return match === '物理' ? '语文' : match === '化学' ? '数学' : match === '生物' ? '英语' : '语数英';
+                });
+            } else {
+                document.querySelectorAll('label[id^="label"]').forEach(label => {
+                    label.textContent = label.textContent.replace(/语文|数学|英语/g, function(match) {
+                        return match === '语文' ? '物理' : match === '数学' ? '化学' : '生物';
+                    });
+                });
+
+                document.querySelectorAll('select.options option').forEach(option => {
+                    option.textContent = option.textContent.replace(/语文|数学|英语/g, function(match) {
+                        return match === '语文' ? '物理' : match === '数学' ? '化学' : '英语';
+                    });
+                });
+
+                document.getElementById('outputText').value = document.getElementById('outputText').value.replace(/语文|数学|英语|语数英/g, function(match) {
+                    return match === '语文' ? '物理' : match === '数学' ? '化学' : match === '英语' ? '生物' : '物化生';
+                });
+            }
         }
 
         function copyToClipboard() {
@@ -234,19 +303,6 @@
             outputText.setSelectionRange(0, 99999); // 适用于移动设备
             document.execCommand("copy");
             alert("文本已复制到剪切板");
-            
-            // 尝试打开微信
-            window.location.href = "weixin://";
-        }
-
-        function fetchBingWallpaper() {
-            fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN')
-                .then(response => response.json())
-                .then(data => {
-                    var imageUrl = 'https://www.bing.com' + data.images[0].url;
-                    document.body.style.backgroundImage = `url(${imageUrl})`;
-                })
-                .catch(error => console.error('Error fetching Bing wallpaper:', error));
         }
 
         // 设置按钮点击事件
@@ -272,12 +328,16 @@
             localStorage.setItem("darkMode", darkModeEnabled);
 
             // 保存组长模式设置
-            var isLeaderMode = document.getElementById("leaderModeToggle").checked;
-            localStorage.setItem("isLeaderMode", isLeaderMode);
+            var leaderModeEnabled = document.getElementById("leaderModeToggle").checked;
+            localStorage.setItem("leaderMode", leaderModeEnabled);
+
+            // 保存组别设置
+            var groupSelected = document.getElementById("groupSelect").value;
+            localStorage.setItem("group", groupSelected);
 
             updateLabels(names);
             applyDarkMode(darkModeEnabled);
-            applyLeaderMode(isLeaderMode);
+            applyLeaderMode(leaderModeEnabled);
             closeSettingsModal();
             alert("设置已保存");
         }
@@ -297,24 +357,9 @@
                 document.body.classList.remove("dark-mode");
             }
         }
-        // 应用组长模式
-        function applyLeaderMode(enabled) {
-            var selects = document.getElementsByClassName("options");
-            for (var i = 0; i < selects.length; i++) {
-                for (var j = 0; j < selects[i].options.length; j++) {
-                    if (enabled) {
-                        selects[i].options[j].text = selects[i].options[j].text.replace(/物理/g, "语文").replace(/化学/g, "数学").replace(/生物/g, "英语");
-                        selects[i].options[j].value = selects[i].options[j].value.replace(/物理/g, "语文").replace(/化学/g, "数学").replace(/生物/g, "英语");
-                    } else {
-                        selects[i].options[j].text = selects[i].options[j].text.replace(/语文/g, "物理").replace(/数学/g, "化学").replace(/英语/g, "生物");
-                        selects[i].options[j].value = selects[i].options[j].value.replace(/语文/g, "物理").replace(/数学/g, "化学").replace(/英语/g, "生物");
-                    }
-                }
-            }
-        }
+
         // 加载设置
         function loadSettings() {
-            fetchBingWallpaper();
             var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
             for (let i = 1; i <= 6; i++) {
                 document.getElementById(`name${i}`).value = savedNames[i - 1];
@@ -327,9 +372,13 @@
             applyDarkMode(darkModeEnabled);
 
             // 加载组长模式设置
-            var isLeaderMode = JSON.parse(localStorage.getItem("isLeaderMode")) || false;
-            document.getElementById("leaderModeToggle").checked = isLeaderMode;
-            applyLeaderMode(isLeaderMode);
+            var leaderModeEnabled = JSON.parse(localStorage.getItem("leaderMode")) || false;
+            document.getElementById("leaderModeToggle").checked = leaderModeEnabled;
+            applyLeaderMode(leaderModeEnabled);
+
+            // 加载组别设置
+            var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
+            document.getElementById("groupSelect").value = groupSelected;
         }
 
         window.onload = loadSettings;
@@ -465,6 +514,20 @@
             <input type="text" id="name4" placeholder="姓名4">
             <input type="text" id="name5" placeholder="姓名5">
             <input type="text" id="name6" placeholder="姓名6">
+            <label>
+            组别:
+            <select id="groupSelect">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+            </label>
             <label>
                 <input type="checkbox" id="darkModeToggle">
                 暗黑模式
