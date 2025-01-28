@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>作业检查</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             display: flex;
@@ -11,62 +12,148 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: Arial, sans-serif;
-            position: relative; /* 添加相对定位以便页脚绝对定位 */
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            position: relative;
         }
+
         .container {
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 600px;
             overflow-y: auto;
             height: 90vh;
         }
+
         .options-container {
             margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 10px;
+            font-weight: bold;
         }
+
         select {
             margin-bottom: 10px;
             padding: 5px;
             width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
+
         button {
             padding: 10px 20px;
             margin: 10px;
             cursor: pointer;
             width: 100%;
             box-sizing: border-box;
+            border: none;
+            border-radius: 4px;
+            background-color: #6200ea;
+            color: white;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
+
+        button:hover {
+            background-color: #3700b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
         textarea {
             width: 100%;
             margin-top: 20px;
             box-sizing: border-box;
-            height: 100px; /* 调整文本区域高度 */
+            height: 100px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
         }
 
-        @media (max-width: 600px) {
-            body {
-                font-size: 16px;
-                line-height: 1.5;
-            }
-            .container {
-                padding: 15px;
-                height: 90vh;
-            }
-            button, select, textarea {
-                padding: 10px;
-                margin: 5px 0;
-            }
-            label {
-                margin-bottom: 5px;
-            }
+        .button-group {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .options-group {
+            margin-bottom: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-settings-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .modal button:hover {
+            background-color: #3700b3;
         }
 
         /* 页脚样式 */
@@ -78,10 +165,12 @@
             font-size: 14px;
             color: #333;
         }
+
         .footer a {
             text-decoration: underline;
-            color: #007BFF;
+            color: #6200ea;
         }
+
         .footer a:hover {
             text-decoration: none;
         }
@@ -91,68 +180,21 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: #007BFF;
+            background-color: #6200ea;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-        }
-        .settings-button:hover {
-            background-color: #0056b3;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
         }
 
-        /* 模态框样式 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 5px;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .modal input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        .modal button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .modal button:hover {
-            background-color: #0056b3;
+        .settings-button:hover {
+            background-color: #3700b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
         }
 
         /* 暗黑模式样式 */
@@ -162,7 +204,7 @@
         }
 
         body.dark-mode .container {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: #1f1f1f;
             color: #ffffff;
         }
 
@@ -171,15 +213,21 @@
         }
 
         body.dark-mode .footer a {
-            color: #007BFF;
+            color: #bb86fc;
         }
 
         body.dark-mode .settings-button {
-            background-color: #4CAF50;
+            background-color: #bb86fc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .settings-button:hover {
+            background-color: #3700b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
         body.dark-mode .modal {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.7);
         }
 
         body.dark-mode .modal-content {
@@ -187,15 +235,9 @@
             color: #ffffff;
         }
 
-        body.dark-mode .modal input[type="text"] {
-            background-color: #333;
-            color: #ffffff;
-        }
-
         body.dark-mode .modal button {
-            background-color: #4CAF50;
+            background-color: #bb86fc;
         }
-
     </style>
     <script>
         function showSelectedOptions() {
@@ -258,7 +300,7 @@
             var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
 
             var outputText = document.getElementById("outputText");
-            outputText.value = `${formattedDate} 第${groupSelected}小组${leaderModeEnabled ? "语数英" : "物化生"}作业检查\n${formattedOutput}`;
+            outputText.value = `第${groupSelected}组 ${formattedDate} 作业完成情况\n${formattedOutput}`;
         }
 
         function applyLeaderMode(enabled) {
@@ -380,6 +422,7 @@
             var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
             document.getElementById("groupSelect").value = groupSelected;
         }
+
 
         window.onload = loadSettings;
     </script>
