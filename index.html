@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>作业检查</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.6/antd.min.css">
     <style>
         body {
             display: flex;
@@ -46,6 +47,15 @@
             width: 100%;
             border: 1px solid #ccc;
             border-radius: 5px;
+            background-color: #ffffff;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode select {
+            background-color: #333;
+            color: #ffffff;
+            border-color: #555;
         }
 
         button {
@@ -77,6 +87,15 @@
             border-radius: 5px;
             padding: 10px;
             font-size: 14px;
+            background-color: #ffffff;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode textarea {
+            background-color: #333;
+            color: #ffffff;
+            border-color: #555;
         }
 
         .button-group {
@@ -239,6 +258,7 @@
             background-color: #bb86fc;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.6/antd.min.js"></script>
     <script>
         function showSelectedOptions() {
             var options = document.getElementsByClassName("options");
@@ -248,7 +268,6 @@
 
             // 从 localStorage 中获取保存的名字
             var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
-
             // 根据组长模式状态调整学科名称
             var leaderModeEnabled = JSON.parse(localStorage.getItem("leaderMode")) || false;
             var subjectMap = {
@@ -289,12 +308,12 @@
                 subjectOptions[subjectMap[subject]].push(`${savedNames[Math.floor(index / 3)]} ${cleanedValue}`);
             });
 
-            // 按学科顺序拼接输出字符串
-            var formattedOutput = [
-                `${subjectMap["物理"]}: ${subjectOptions[subjectMap["物理"]].join(", ")}`,
-                `${subjectMap["化学"]}: ${subjectOptions[subjectMap["化学"]].join(", ")}`,
-                `${subjectMap["生物"]}: ${subjectOptions[subjectMap["生物"]].join(", ")}`.replace("undefined", "")
-            ].join("\n");
+            // 检查每个学科是否全员完成良好
+            var formattedOutput = Object.keys(subjectOptions).map(subject => {
+                var allGood = subjectOptions[subject].every(option => option.includes("完成良好"));
+                var output = allGood ? `${subject}: 全员良好` : `${subject}: ${subjectOptions[subject].join(", ")}`;
+                return output;
+            }).join("\n");
 
             // 从 localStorage 中获取保存的组别
             var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
