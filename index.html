@@ -2,617 +2,865 @@
 <html lang="zh-CN">
 <head>
     <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJCFX2VZNJ"></script>
-        <script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJCFX2VZNJ"></script>
+    <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'G-HJCFX2VZNJ');
-        </script>
+    </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>作业检查</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>作业检查 · 自选科目</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.6/antd.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background-color: #f4f6fa;
+            color: #1e293b;
+            padding: 16px;
+            transition: background-color 0.3s, color 0.3s;
             position: relative;
+            overflow-x: hidden; /* 防止小屏幕横向滚动 */
+        }
+
+        body.dark-mode {
+            background-color: #0f172a;
+            color: #e2e8f0;
         }
 
         .container {
-            text-align: center;
             background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-            overflow-y: auto;
-            height: 90vh;
-        }
-
-        .options-container {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        select {
-            margin-bottom: 10px;
-            padding: 5px;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.15), 0 5px 10px -4px rgba(0, 0, 0, 0.05);
             width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #ffffff;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
+            max-width: 1100px;
+            padding: 28px 24px;
+            transition: background-color 0.3s, box-shadow 0.3s, padding 0.2s;
+            position: relative;
+            margin: 60px 0 40px 0;
         }
 
-        body.dark-mode select {
-            background-color: #333;
+        body.dark-mode .container {
+            background-color: #1e293b;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .subhead {
+            color: #64748b;
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+            border-left: 4px solid #818cf8;
+            padding-left: 12px;
+        }
+
+        body.dark-mode .subhead {
+            color: #94a3b8;
+        }
+
+        /* 人员卡片网格 */
+        .people-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin: 32px 0 28px;
+        }
+
+        .person-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px 18px;
+            border: 1px solid #e9eef2;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        body.dark-mode .person-card {
+            background: #2d3a4f;
+            border-color: #334155;
+        }
+
+        .person-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 8px;
+        }
+
+        body.dark-mode .person-header {
+            border-bottom-color: #475569;
+        }
+
+        .person-name {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            word-break: break-word; /* 长名字折行 */
+        }
+
+        body.dark-mode .person-name {
+            background: #4f46e5;
             color: #ffffff;
-            border-color: #555;
         }
 
-        button {
-            padding: 10px 20px;
-            margin: 10px;
+        /* 学科行 */
+        .subject-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+            background: #ffffff;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+        body.dark-mode .subject-row {
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        .subject-check {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 70px;
+        }
+        .subject-check input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4f46e5;
             cursor: pointer;
-            width: 100%;
-            box-sizing: border-box;
-            border: none;
-            border-radius: 4px;
-            background-color: #6200ea;
-            color: white;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        .subject-check label {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin: 0;
+            cursor: pointer;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+        body.dark-mode .subject-check label {
+            color: #f1f5f9;
         }
 
-        button:hover {
-            background-color: #3700b3;
+        .dimension-selects {
+            display: flex;
+            flex: 2 1 400px;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+        }
+
+        .dim-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 4px 12px 4px 8px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            min-width: 140px;  /* 保证最小宽度，避免太窄 */
+            flex: 1 0 auto;
+        }
+        body.dark-mode .dim-item {
+            background: #334155;
+        }
+
+        .dim-item select {
+            border: none;
+            background: transparent;
+            font-weight: 500;
+            padding: 6px 4px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            color: #0f172a;
+            flex: 1;  /* 让select占据剩余宽度 */
+            min-width: 80px;  /* 确保在小屏上可点 */
+        }
+        body.dark-mode .dim-item select {
+            color: #f1f5f9;
+            background-color: #475569;
+        }
+        .dim-item select option {
+            background: white;
+            color: black;
+        }
+        body.dark-mode .dim-item select option {
+            background: #2d3a4f;
+            color: #f1f5f9;
+        }
+
+        .dim-label {
+            font-weight: 500;
+            color: #475569;
+            white-space: nowrap;
+        }
+        body.dark-mode .dim-label {
+            color: #cbd5e1;
+        }
+
+        /* 按钮组 */
+        .action-bar {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0 20px;
+        }
+
+        .primary-btn {
+            background: #4f46e5;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 8px 16px -6px #a5b4fc;
+            transition: 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            min-width: 160px;
+            flex: 0 1 auto;
+        }
+        .primary-btn:hover {
+            background: #6366f1;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 14px 22px -8px #818cf8;
+        }
+        .secondary-btn {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 14px 36px;
+            border-radius: 60px;
+            font-weight: 500;
+            color: #334155;
+            transition: 0.2s;
+            cursor: pointer;
+            min-width: 160px;
+            flex: 0 1 auto;
+        }
+        .secondary-btn:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        body.dark-mode .secondary-btn {
+            background: #1e293b;
+            color: #f1f5f9;
+            border-color: #64748b;
+        }
+        body.dark-mode .secondary-btn:hover {
+            background: #2d3a4f;
         }
 
         textarea {
             width: 100%;
-            margin-top: 20px;
-            box-sizing: border-box;
-            height: 100px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 14px;
-            background-color: #ffffff;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            padding: 20px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 20px 0 10px;
+            resize: vertical;
+            color: #1e293b;
         }
-
         body.dark-mode textarea {
-            background-color: #333;
-            color: #ffffff;
-            border-color: #555;
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
         }
 
-        .button-group {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
+        .settings-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #1e293b;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.04);
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            z-index: 100;
+            font-size: 0.95rem;
+        }
+        .settings-button:hover {
+            background: #f1f5f9;
+            transform: scale(1.02);
+        }
+        body.dark-mode .settings-button {
+            background: #1e293b;
+            color: #f1f5f9;
+            border-color: #475569;
         }
 
-        .options-group {
-            margin-bottom: 15px;
-        }
-
+        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
         }
-
         .modal-content {
-            background-color: #ffffff;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 5px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            background: white;
+            max-width: 460px;
+            width: 100%;
+            border-radius: 36px;
+            padding: 28px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            animation: modalFade 0.2s;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-
+        body.dark-mode .modal-content {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .close {
-            color: #aaa;
             float: right;
             font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+            font-weight: 300;
             cursor: pointer;
+            color: #94a3b8;
+            line-height: 1;
         }
+        .close:hover { color: #1e293b; }
+        body.dark-mode .close:hover { color: #f1f5f9; }
 
         .modal-input-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 14px;
+            margin: 24px 0;
         }
-
-        .modal-settings-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .modal button {
+        .modal-input-group input, .modal-input-group select {
+            padding: 14px 18px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            font-size: 1rem;
             width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #6200ea;
-            color: white;
-            border: none;
-            border-radius: 4px;
+        }
+        body.dark-mode .modal-input-group input,
+        body.dark-mode .modal-input-group select {
+            background: #0f172a;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+        /* 科目多选样式 */
+        .subject-picker {
+            background: #f1f5f9;
+            border-radius: 28px;
+            padding: 16px 20px;
+            margin-top: 8px;
+        }
+        .subject-picker p {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .subject-picker label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 24px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            white-space: nowrap; /* 防止换行 */
+        }
+        .subject-picker input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4f46e5;
         }
 
-        .modal button:hover {
-            background-color: #3700b3;
-        }
-
-        /* 页脚样式 */
         .footer {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            color: #333;
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        .footer a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+        body.dark-mode .footer a { color: #a5b4fc; }
+
+        /* ========== 响应式增强 (适配各种屏幕) ========== */
+        @media (max-width: 700px) {
+            .container {
+                padding: 22px 18px;
+            }
+            h1 {
+                font-size: 1.9rem;
+            }
         }
 
-        .footer a {
-            text-decoration: underline;
-            color: #6200ea;
+        @media (max-width: 600px) {
+            .subject-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .subject-check {
+                margin-bottom: 4px;
+            }
+            .dimension-selects {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .dim-item {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .dim-item select {
+                max-width: 60%;  /* 在非常小的屏幕上给select更多空间 */
+            }
+            .action-bar button {
+                width: 100%;
+                min-width: unset;
+            }
         }
 
-        .footer a:hover {
-            text-decoration: none;
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            .container {
+                padding: 18px 14px;
+                border-radius: 24px;
+                margin-top: 70px;  /* 为固定设置按钮让出空间 */
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .person-card {
+                padding: 16px 12px;
+            }
+            .person-header {
+                font-size: 1.1rem;
+            }
+            .person-name {
+                font-size: 1rem;
+                padding: 4px 14px;
+            }
+            .subject-check label {
+                font-size: 1rem;
+            }
+            .dim-item {
+                font-size: 0.85rem;
+                padding: 6px 10px;
+            }
+            .dim-item select {
+                font-size: 0.85rem;
+                padding: 5px 2px;
+            }
+            .settings-button {
+                padding: 8px 18px;
+                font-size: 0.9rem;
+                top: 12px;
+                right: 12px;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+            .subject-picker label {
+                white-space: normal;  /* 小屏可换行 */
+                margin-right: 12px;
+                margin-bottom: 6px;
+            }
         }
 
-        /* 设置按钮样式 */
-        .settings-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #6200ea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
-        }
-
-        .settings-button:hover {
-            background-color: #3700b3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* 暗黑模式样式 */
-        body.dark-mode {
-            background-color: #121212;
-            color: #ffffff;
-        }
-
-        body.dark-mode .container {
-            background-color: #1f1f1f;
-            color: #ffffff;
-        }
-
-        body.dark-mode .footer {
-            color: #ffffff;
-        }
-
-        body.dark-mode .footer a {
-            color: #bb86fc;
-        }
-
-        body.dark-mode .settings-button {
-            background-color: #bb86fc;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        body.dark-mode .settings-button:hover {
-            background-color: #3700b3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        body.dark-mode .modal {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-
-        body.dark-mode .modal-content {
-            background-color: #1f1f1f;
-            color: #ffffff;
-        }
-
-        body.dark-mode .modal button {
-            background-color: #bb86fc;
+        /* 超小屏 (<=360px) */
+        @media (max-width: 360px) {
+            .dim-item {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .dim-label {
+                width: 100%;
+            }
+            .dim-item select {
+                max-width: 100%;
+                width: 100%;
+            }
+            .subject-check label {
+                white-space: normal;
+                word-break: break-word;
+            }
+            .subject-picker label {
+                display: flex;
+                width: 100%;
+                margin-right: 0;
+            }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.6/antd.min.js"></script>
-    <script>
-        function showSelectedOptions() {
-            var options = document.getElementsByClassName("options");
-            var selectedValues = Array.from(options).map(option => option.value);
-            var currentDate = new Date();
-            var formattedDate = currentDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-
-            // 从 localStorage 中获取保存的名字
-            var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
-            // 根据组长模式状态调整学科名称
-            var leaderModeEnabled = JSON.parse(localStorage.getItem("leaderMode")) || false;
-            var subjectMap = {
-                物理: leaderModeEnabled ? "语文" : "物理",
-                化学: leaderModeEnabled ? "数学" : "化学",
-                生物: leaderModeEnabled ? "英语" : "生物"
-            };
-
-            // 创建一个对象来存储每个学科的选项
-            var subjectOptions = {
-                物理: [],
-                化学: [],
-                生物: []
-            };
-
-            if (leaderModeEnabled) {
-                subjectOptions = {
-                    语文: [],
-                    数学: [],
-                    英语: []
-                };
-            }
-
-            // 将选项分配到对应的学科数组中，并去除学科名称和“作业”二字
-            selectedValues.forEach((value, index) => {
-                let subject;
-                if (value.includes("物理")) {
-                    subject = "物理";
-                } else if (value.includes("化学")) {
-                    subject = "化学";
-                } else if (value.includes("生物")) {
-                    subject = "生物";
-                }
-
-                // 去除“作业”二字和学科名称
-                let cleanedValue = value.replace(/(物理|化学|生物)作业/g, "").trim();
-
-                subjectOptions[subjectMap[subject]].push(`${savedNames[Math.floor(index / 3)]} ${cleanedValue}`);
-            });
-
-            // 检查每个学科是否全员完成良好
-            var formattedOutput = Object.keys(subjectOptions).map(subject => {
-                var allGood = subjectOptions[subject].every(option => option.includes("完成良好"));
-                var output = allGood ? `${subject}: 全员良好` : `${subject}: ${subjectOptions[subject].join(", ")}`;
-                return output;
-            }).join("\n");
-
-            // 从 localStorage 中获取保存的组别
-            var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
-
-            var outputText = document.getElementById("outputText");
-            outputText.value = `第${groupSelected}组 ${formattedDate} 作业完成情况\n${formattedOutput}`;
-        }
-
-        function applyLeaderMode(enabled) {
-            if (enabled) {
-                document.querySelectorAll('label[id^="label"]').forEach(label => {
-                    label.textContent = label.textContent.replace(/物理|化学|生物/g, function(match) {
-                        return match === '物理' ? '语文' : match === '化学' ? '数学' : '英语';
-                    });
-                });
-
-                document.querySelectorAll('select.options option').forEach(option => {
-                    option.textContent = option.textContent.replace(/物理|化学|生物/g, function(match) {
-                        return match === '物理' ? '语文' : match === '化学' ? '数学' : '英语';
-                    });
-                });
-
-                document.getElementById('outputText').value = document.getElementById('outputText').value.replace(/物理|化学|生物|物化生/g, function(match) {
-                    return match === '物理' ? '语文' : match === '化学' ? '数学' : match === '生物' ? '英语' : '语数英';
-                });
-            } else {
-                document.querySelectorAll('label[id^="label"]').forEach(label => {
-                    label.textContent = label.textContent.replace(/语文|数学|英语/g, function(match) {
-                        return match === '语文' ? '物理' : match === '数学' ? '化学' : '生物';
-                    });
-                });
-
-                document.querySelectorAll('select.options option').forEach(option => {
-                    option.textContent = option.textContent.replace(/语文|数学|英语/g, function(match) {
-                        return match === '语文' ? '物理' : match === '数学' ? '化学' : '英语';
-                    });
-                });
-
-                document.getElementById('outputText').value = document.getElementById('outputText').value.replace(/语文|数学|英语|语数英/g, function(match) {
-                    return match === '语文' ? '物理' : match === '数学' ? '化学' : match === '英语' ? '生物' : '物化生';
-                });
-            }
-        }
-
-        function copyToClipboard() {
-            var outputText = document.getElementById("outputText");
-            outputText.select();
-            outputText.setSelectionRange(0, 99999); // 适用于移动设备
-            document.execCommand("copy");
-            alert("文本已复制到剪切板");
-        }
-
-        // 设置按钮点击事件
-        function openSettingsModal() {
-            document.getElementById("settingsModal").style.display = "block";
-        }
-
-        // 关闭模态框
-        function closeSettingsModal() {
-            document.getElementById("settingsModal").style.display = "none";
-        }
-
-        // 保存设置
-        function saveSettings() {
-            var names = [];
-            for (let i = 1; i <= 6; i++) {
-                names.push(document.getElementById(`name${i}`).value);
-            }
-            localStorage.setItem("names", JSON.stringify(names));
-
-            // 保存暗黑模式设置
-            var darkModeEnabled = document.getElementById("darkModeToggle").checked;
-            localStorage.setItem("darkMode", darkModeEnabled);
-
-            // 保存组长模式设置
-            var leaderModeEnabled = document.getElementById("leaderModeToggle").checked;
-            localStorage.setItem("leaderMode", leaderModeEnabled);
-
-            // 保存组别设置
-            var groupSelected = document.getElementById("groupSelect").value;
-            localStorage.setItem("group", groupSelected);
-
-            updateLabels(names);
-            applyDarkMode(darkModeEnabled);
-            applyLeaderMode(leaderModeEnabled);
-            closeSettingsModal();
-            alert("设置已保存");
-        }
-
-        // 更新标签
-        function updateLabels(names) {
-            for (let i = 1; i <= 6; i++) {
-                document.getElementById(`label${i}`).textContent = `${names[i - 1]}:`; 
-            }
-        }
-
-        // 应用暗黑模式
-        function applyDarkMode(enabled) {
-            if (enabled) {
-                document.body.classList.add("dark-mode");
-            } else {
-                document.body.classList.remove("dark-mode");
-            }
-        }
-
-        // 加载设置
-        function loadSettings() {
-            var savedNames = JSON.parse(localStorage.getItem("names")) || ["1", "2", "3", "4", "5", "6"];
-            for (let i = 1; i <= 6; i++) {
-                document.getElementById(`name${i}`).value = savedNames[i - 1];
-            }
-            updateLabels(savedNames);
-
-            // 加载暗黑模式设置
-            var darkModeEnabled = JSON.parse(localStorage.getItem("darkMode")) || false;
-            document.getElementById("darkModeToggle").checked = darkModeEnabled;
-            applyDarkMode(darkModeEnabled);
-
-            // 加载组长模式设置
-            var leaderModeEnabled = JSON.parse(localStorage.getItem("leaderMode")) || false;
-            document.getElementById("leaderModeToggle").checked = leaderModeEnabled;
-            applyLeaderMode(leaderModeEnabled);
-
-            // 加载组别设置
-            var groupSelected = JSON.parse(localStorage.getItem("group")) || "1";
-            document.getElementById("groupSelect").value = groupSelected;
-        }
-
-
-        window.onload = loadSettings;
-    </script>
 </head>
 <body>
+    <button class="settings-button" onclick="openSettingsModal()">⚙️ 设置</button>
+
     <div class="container">
-        <h1>作业检查</h1>
-        <div class="options-container">
-            <div>
-                <label id="label1">1:</label>
-                <select class="options">
-                    <option value="物理作业完成良好">物理作业完成良好</option>
-                    <option value="物理作业未订正">物理作业未订正</option>
-                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="化学作业完成良好">化学作业完成良好</option>
-                    <option value="化学作业未订正">化学作业未订正</option>
-                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="生物作业完成良好">生物作业完成良好</option>
-                    <option value="生物作业未订正">生物作业未订正</option>
-                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
-                </select>
-            </div>
-            <div>
-                <label id="label2">2:</label>
-                <select class="options">
-                    <option value="物理作业完成良好">物理作业完成良好</option>
-                    <option value="物理作业未订正">物理作业未订正</option>
-                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="化学作业完成良好">化学作业完成良好</option>
-                    <option value="化学作业未订正">化学作业未订正</option>
-                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="生物作业完成良好">生物作业完成良好</option>
-                    <option value="生物作业未订正">生物作业未订正</option>
-                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
-                </select>
-            </div>
-            <div>
-                <label id="label3">3:</label>
-                <select class="options">
-                    <option value="物理作业完成良好">物理作业完成良好</option>
-                    <option value="物理作业未订正">物理作业未订正</option>
-                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="化学作业完成良好">化学作业完成良好</option>
-                    <option value="化学作业未订正">化学作业未订正</option>
-                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="生物作业完成良好">生物作业完成良好</option>
-                    <option value="生物作业未订正">生物作业未订正</option>
-                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
-                </select>
-            </div>
-            <div>
-                <label id="label4">4:</label>
-                <select class="options">
-                    <option value="物理作业完成良好">物理作业完成良好</option>
-                    <option value="物理作业未订正">物理作业未订正</option>
-                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="化学作业完成良好">化学作业完成良好</option>
-                    <option value="化学作业未订正">化学作业未订正</option>
-                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="生物作业完成良好">生物作业完成良好</option>
-                    <option value="生物作业未订正">生物作业未订正</option>
-                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
-                </select>
-            </div>
-            <div>
-                <label id="label5">5:</label>
-                <select class="options">
-                    <option value="物理作业完成良好">物理作业完成良好</option>
-                    <option value="物理作业未订正">物理作业未订正</option>
-                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="化学作业完成良好">化学作业完成良好</option>
-                    <option value="化学作业未订正">化学作业未订正</option>
-                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="生物作业完成良好">生物作业完成良好</option>
-                    <option value="生物作业未订正">生物作业未订正</option>
-                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
-                </select>
-            </div>
-            <div>
-                <label id="label6">6:</label>
-                <select class="options">
-                    <option value="物理作业完成良好">物理作业完成良好</option>
-                    <option value="物理作业未订正">物理作业未订正</option>
-                    <option value="物理作业字迹潦草">物理作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="化学作业完成良好">化学作业完成良好</option>
-                    <option value="化学作业未订正">化学作业未订正</option>
-                    <option value="化学作业字迹潦草">化学作业字迹潦草</option>
-                </select>
-                <select class="options">
-                    <option value="生物作业完成良好">生物作业完成良好</option>
-                    <option value="生物作业未订正">生物作业未订正</option>
-                    <option value="生物作业字迹潦草">生物作业字迹潦草</option>
-                </select>
-            </div>
+        <h1>📋 作业检查 · 自选科目</h1>
+        <div class="subhead">完成程度 · 字体 · 过程完整度 — 每位成员独立勾选需检查的科目</div>
+
+        <!-- 动态渲染的人员卡片会插入这里 -->
+        <div id="peopleContainer" class="people-grid"></div>
+
+        <div class="action-bar">
+            <button class="primary-btn" onclick="generateReport()">📋 生成报告</button>
+            <button class="secondary-btn" onclick="copyReport()">📎 复制报告</button>
         </div>
-        <button onclick="showSelectedOptions()">确定</button>
-        <textarea id="outputText" rows="10" cols="50" readonly></textarea>
-        <button onclick="copyToClipboard()">复制</button>
+
+        <textarea id="outputText" rows="6" placeholder="报告将显示在这里..." readonly></textarea>
+
+        <div class="footer">
+            ✦ 无际航天 ✦ <a href="https://wjhtkjwz.eu.org/" target="_blank">去博客看看</a>
+        </div>
     </div>
-    <!-- 设置按钮 -->
-    <button class="settings-button" onclick="openSettingsModal()">设置</button>
-    <!-- 模态框 -->
+
+    <!-- 设置模态框 (移除组长模式，增加科目多选) -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeSettingsModal()">&times;</span>
-            <h2>设置</h2>
-            <input type="text" id="name1" placeholder="姓名1">
-            <input type="text" id="name2" placeholder="姓名2">
-            <input type="text" id="name3" placeholder="姓名3">
-            <input type="text" id="name4" placeholder="姓名4">
-            <input type="text" id="name5" placeholder="姓名5">
-            <input type="text" id="name6" placeholder="姓名6">
-            <label>
-            组别:
-            <select id="groupSelect">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-            </select>
+            <h2 style="margin-top: 0;">⚙️ 初始设置</h2>
+            <div class="modal-input-group">
+                <input type="text" id="name1" placeholder="组员1 姓名">
+                <input type="text" id="name2" placeholder="组员2 姓名">
+                <input type="text" id="name3" placeholder="组员3 姓名">
+                <input type="text" id="name4" placeholder="组员4 姓名">
+                <input type="text" id="name5" placeholder="组员5 姓名">
+                <input type="text" id="name6" placeholder="组员6 姓名">
+                <select id="groupSelect">
+                    <option value="1">第1组</option><option value="2">第2组</option><option value="3">第3组</option>
+                    <option value="4">第4组</option><option value="5">第5组</option><option value="6">第6组</option>
+                    <option value="7">第7组</option><option value="8">第8组</option><option value="9">第9组</option>
+                </select>
+
+                <!-- 科目多选 (全局) -->
+                <div class="subject-picker">
+                    <p>📌 选择要检查的科目</p>
+                    <label><input type="checkbox" id="subjPhys" value="物理" checked> 物理</label>
+                    <label><input type="checkbox" id="subjChem" value="化学" checked> 化学</label>
+                    <label><input type="checkbox" id="subjBio" value="生物" checked> 生物</label>
+                </div>
+            </div>
+            <label style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="darkModeToggle"> 暗黑模式
             </label>
-            <label>
-                <input type="checkbox" id="darkModeToggle">
-                暗黑模式
-            </label>
-            <label>
-                <input type="checkbox" id="leaderModeToggle">
-                组长模式
-            </label>
-            <button onclick="saveSettings()">保存</button>
+            <!-- 已移除组长模式复选框 -->
+            <button class="primary-btn" onclick="saveSettings()" style="width:100%; margin-top:20px;">保存并开始</button>
         </div>
     </div>
-    <!-- 页脚 -->
-    <div class="footer">
-        Made by 无际航天 <a href="https://wjhtkjwz.eu.org/" target="_blank">去我的博客看看吧</a>
-    </div>
+
+    <script>
+        (function() {
+            // ----- 核心数据 & 维度定义 -----
+            const DIMENSIONS = {
+                completion: { label: '完成程度', options: ['完成良好', '未完成', '部分完成'] },
+                font: { label: '字体', options: ['工整', '潦草', '一般'] },
+                process: { label: '过程完整度', options: ['完整', '缺少步骤', '不完整'] }
+            };
+
+            const BEST_VALUES = {
+                completion: '完成良好',
+                font: '工整',
+                process: '完整'
+            };
+
+            // 固定基础科目 (不再使用组长模式)
+            const ALL_SUBJECTS = ['物理', '化学', '生物'];
+
+            // ----- 获取要显示的科目 (根据本地存储的选中科目) -----
+            function getSelectedSubjects() {
+                const stored = localStorage.getItem('selectedSubjects');
+                if (stored) {
+                    try {
+                        const arr = JSON.parse(stored);
+                        // 过滤掉可能不存在的科目 (但保留有效值)
+                        return arr.filter(s => ALL_SUBJECTS.includes(s));
+                    } catch (e) {
+                        return [...ALL_SUBJECTS]; // 出错时返回全部
+                    }
+                }
+                return [...ALL_SUBJECTS]; // 默认全部
+            }
+
+            // ----- 渲染人员卡片 (基于选中的科目) -----
+            function renderPeople() {
+                const container = document.getElementById('peopleContainer');
+                if (!container) return;
+                
+                const savedNames = JSON.parse(localStorage.getItem('names')) || ['1', '2', '3', '4', '5', '6'];
+                const subjects = getSelectedSubjects();   // 仅显示用户勾选的科目
+
+                let html = '';
+                for (let p = 0; p < 6; p++) {
+                    const personName = savedNames[p] || (p+1).toString();
+                    html += `<div class="person-card" data-person-index="${p}">`;
+                    html += `<div class="person-header"><span class="person-name">👤 ${personName}</span></div>`;
+
+                    subjects.forEach((subject, subjIdx) => {
+                        html += `<div class="subject-row" data-subject="${subject}">`;
+                        // 个人级别复选框 (默认勾选，表示该成员此科目参与报告)
+                        html += `<div class="subject-check">`;
+                        html += `<input type="checkbox" class="subject-checkbox" id="chk_${p}_${subjIdx}" checked>`;
+                        html += `<label for="chk_${p}_${subjIdx}">${subject}</label>`;
+                        html += `</div>`;
+
+                        // 三个维度下拉
+                        html += `<div class="dimension-selects">`;
+                        // 完成程度
+                        html += `<div class="dim-item"><span class="dim-label">完成</span>`;
+                        html += `<select class="dim-completion" data-dim="completion">`;
+                        DIMENSIONS.completion.options.forEach(opt => html += `<option value="${opt}">${opt}</option>`);
+                        html += `</select></div>`;
+                        // 字体
+                        html += `<div class="dim-item"><span class="dim-label">字体</span>`;
+                        html += `<select class="dim-font" data-dim="font">`;
+                        DIMENSIONS.font.options.forEach(opt => html += `<option value="${opt}">${opt}</option>`);
+                        html += `</select></div>`;
+                        // 过程完整度
+                        html += `<div class="dim-item"><span class="dim-label">过程</span>`;
+                        html += `<select class="dim-process" data-dim="process">`;
+                        DIMENSIONS.process.options.forEach(opt => html += `<option value="${opt}">${opt}</option>`);
+                        html += `</select></div>`;
+                        html += `</div>`; // dimension-selects
+                        html += `</div>`; // subject-row
+                    });
+                    html += `</div>`; // person-card
+                }
+                container.innerHTML = html;
+            }
+
+            // ----- 生成报告 (基于全局选中科目 + 个人勾选) -----
+            function generateReport() {
+                const subjects = getSelectedSubjects();  // 全局显示的科目
+                const savedNames = JSON.parse(localStorage.getItem('names')) || ['1', '2', '3', '4', '5', '6'];
+                const group = JSON.parse(localStorage.getItem('group')) || '1';
+
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
+
+                // 存储每个科目的问题列表
+                const subjectIssues = {};
+                subjects.forEach(s => subjectIssues[s] = []);
+
+                const cards = document.querySelectorAll('.person-card');
+                cards.forEach((card, personIdx) => {
+                    const personName = savedNames[personIdx] || (personIdx+1).toString();
+                    const rows = card.querySelectorAll('.subject-row');
+                    
+                    rows.forEach((row) => {
+                        const chk = row.querySelector('.subject-checkbox');
+                        if (!chk || !chk.checked) return; // 个人未勾选此科目
+
+                        // 获取科目名称 (从 data-subject 或行内文本)
+                        let subject = row.dataset.subject;
+                        if (!subject) {
+                            // 后备：从label获取
+                            const label = row.querySelector('.subject-check label');
+                            subject = label ? label.innerText.trim() : '';
+                        }
+                        if (!subject || !subjects.includes(subject)) return; // 安全过滤
+
+                        const completion = row.querySelector('.dim-completion')?.value || '';
+                        const font = row.querySelector('.dim-font')?.value || '';
+                        const process = row.querySelector('.dim-process')?.value || '';
+
+                        const isAllBest = (completion === BEST_VALUES.completion && 
+                                           font === BEST_VALUES.font && 
+                                           process === BEST_VALUES.process);
+
+                        if (!isAllBest) {
+                            const faults = [];
+                            if (completion !== BEST_VALUES.completion) faults.push(`完成:${completion}`);
+                            if (font !== BEST_VALUES.font) faults.push(`字体:${font}`);
+                            if (process !== BEST_VALUES.process) faults.push(`过程:${process}`);
+                            const detail = faults.join('; ');
+                            subjectIssues[subject].push(`${personName} (${detail})`);
+                        }
+                    });
+                });
+
+                let output = `第${group}组 ${dateStr} 作业完成情况\n`;
+                subjects.forEach(subject => {
+                    const issues = subjectIssues[subject];
+                    if (issues.length === 0) {
+                        output += `${subject}：全员良好\n`;
+                    } else {
+                        output += `${subject}：${issues.join('； ')}\n`;
+                    }
+                });
+
+                const outputEl = document.getElementById('outputText');
+                if (outputEl) outputEl.value = output;
+            }
+
+            function copyReport() {
+                const output = document.getElementById('outputText');
+                if (!output.value.trim()) {
+                    alert('还没有生成报告，请先点击“生成报告”');
+                    return;
+                }
+                output.select();
+                output.setSelectionRange(0, 99999);
+                document.execCommand('copy');
+                alert('报告已复制到剪贴板');
+            }
+
+            // ----- 设置相关 -----
+            function openSettingsModal() {
+                // 填充姓名
+                const savedNames = JSON.parse(localStorage.getItem('names')) || ['1', '2', '3', '4', '5', '6'];
+                for (let i=1; i<=6; i++) {
+                    const input = document.getElementById(`name${i}`);
+                    if (input) input.value = savedNames[i-1];
+                }
+
+                // 组别
+                const group = JSON.parse(localStorage.getItem('group')) || '1';
+                const groupSelect = document.getElementById('groupSelect');
+                if (groupSelect) groupSelect.value = group;
+
+                // 暗黑模式
+                const dark = JSON.parse(localStorage.getItem('darkMode')) || false;
+                document.getElementById('darkModeToggle').checked = dark;
+
+                // 科目复选框：从 localStorage 读取选中科目，默认全选
+                const selected = getSelectedSubjects();  // 返回数组
+                document.getElementById('subjPhys').checked = selected.includes('物理');
+                document.getElementById('subjChem').checked = selected.includes('化学');
+                document.getElementById('subjBio').checked = selected.includes('生物');
+
+                document.getElementById('settingsModal').style.display = 'flex';
+            }
+
+            function closeSettingsModal() {
+                document.getElementById('settingsModal').style.display = 'none';
+            }
+
+            function saveSettings() {
+                // 保存姓名
+                const names = [];
+                for (let i=1; i<=6; i++) {
+                    names.push(document.getElementById(`name${i}`).value.trim() || (i).toString());
+                }
+                localStorage.setItem('names', JSON.stringify(names));
+
+                // 组别
+                const group = document.getElementById('groupSelect').value;
+                localStorage.setItem('group', JSON.stringify(group));
+
+                // 暗黑模式
+                const dark = document.getElementById('darkModeToggle').checked;
+                localStorage.setItem('darkMode', JSON.stringify(dark));
+                applyDarkMode(dark);
+
+                // 保存选中的科目
+                const selectedSubjects = [];
+                if (document.getElementById('subjPhys').checked) selectedSubjects.push('物理');
+                if (document.getElementById('subjChem').checked) selectedSubjects.push('化学');
+                if (document.getElementById('subjBio').checked) selectedSubjects.push('生物');
+                // 如果啥都没选，给个默认物理 (避免空界面)
+                if (selectedSubjects.length === 0) selectedSubjects.push('物理');
+                localStorage.setItem('selectedSubjects', JSON.stringify(selectedSubjects));
+
+                // 重新渲染卡片 (根据新科目)
+                renderPeople();
+
+                closeSettingsModal();
+                // 不自动弹alert，避免干扰
+            }
+
+            function applyDarkMode(enabled) {
+                if (enabled) document.body.classList.add('dark-mode');
+                else document.body.classList.remove('dark-mode');
+            }
+
+            // 初始化：如果从未设置过科目（第一次访问），自动打开设置模态框
+            function firstTimeSetup() {
+                // 检查是否已有任何用户设置 (可以检测selectedSubjects)
+                const hasSubjects = localStorage.getItem('selectedSubjects') !== null;
+                // 同时检测是否有姓名 (可选)
+                if (!hasSubjects) {
+                    // 首次访问，自动打开设置框
+                    setTimeout(() => {
+                        openSettingsModal();
+                    }, 100); // 略微延迟确保DOM加载
+                }
+                // 无论如何都渲染一次
+                renderPeople();
+            }
+
+            // 页面加载
+            window.addEventListener('load', function() {
+                // 默认值初始化 (防止缺失)
+                if (!localStorage.getItem('names')) {
+                    localStorage.setItem('names', JSON.stringify(['1', '2', '3', '4', '5', '6']));
+                }
+                if (!localStorage.getItem('group')) {
+                    localStorage.setItem('group', JSON.stringify('1'));
+                }
+                if (!localStorage.getItem('darkMode')) {
+                    localStorage.setItem('darkMode', JSON.stringify(false));
+                }
+                // selectedSubjects 不在这里预设，留给 firstTimeSetup 判断
+
+                const dark = JSON.parse(localStorage.getItem('darkMode'));
+                applyDarkMode(dark);
+
+                firstTimeSetup();
+                document.getElementById('outputText').value = '';
+            });
+
+            // 暴露全局函数
+            window.generateReport = generateReport;
+            window.copyReport = copyReport;
+            window.openSettingsModal = openSettingsModal;
+            window.closeSettingsModal = closeSettingsModal;
+            window.saveSettings = saveSettings;
+        })();
+    </script>
 </body>
 </html>
