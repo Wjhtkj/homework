@@ -1,866 +1,886 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJCFX2VZNJ"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-HJCFX2VZNJ');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>作业检查 · 自选科目</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.23.6/antd.min.css">
+    <title>小组作业检查工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* 去除移动端默认灰色高亮 */
         }
-
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7fc;
+            color: #1f2a44;
+            padding: 20px;
             min-height: 100vh;
-            margin: 0;
-            font-family: 'Inter', 'Roboto', sans-serif;
-            background-color: #f4f6fa;
-            color: #1e293b;
-            padding: 16px;
-            transition: background-color 0.3s, color 0.3s;
-            position: relative;
-            overflow-x: hidden; /* 防止小屏幕横向滚动 */
+            transition: background-color 0.3s ease, color 0.2s ease;
+        }
+        body.dark {
+            background-color: #121826;
+            color: #e0e4f0;
+        }
+        body.dark .card {
+            background-color: #1e2436;
+            border: 1px solid #2f3b5c;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+        body.dark .dimension-group .option-btn {
+            background-color: #2b3147;
+            border-color: #3e4b6b;
+            color: #cbd5e6;
+        }
+        body.dark .dimension-group .option-btn.selected {
+            background-color: #2f5a8c;
+            border-color: #4a7bb3;
+            color: white;
+        }
+        body.dark .subject-checkbox+label {
+            background-color: #2b3147;
+            border-color: #4a5a7a;
+        }
+        body.dark .modal-content {
+            background-color: #222837;
+            color: #eef2f9;
+            border: 1px solid #384562;
         }
 
-        body.dark-mode {
-            background-color: #0f172a;
-            color: #e2e8f0;
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
         }
-
-        .container {
-            background-color: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.15), 0 5px 10px -4px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 1100px;
-            padding: 28px 24px;
-            transition: background-color 0.3s, box-shadow 0.3s, padding 0.2s;
-            position: relative;
-            margin: 60px 0 40px 0;
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-
-        body.dark-mode .container {
-            background-color: #1e293b;
-            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.6);
-        }
-
         h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 2rem;
             letter-spacing: -0.02em;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            background: linear-gradient(135deg, #1d4e7f, #0f2c4b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            line-height: 1.2;
         }
-
-        .subhead {
-            color: #64748b;
-            margin-bottom: 28px;
-            font-size: 0.95rem;
-            border-left: 4px solid #818cf8;
-            padding-left: 12px;
+        body.dark h1 {
+            background: linear-gradient(135deg, #90b4de, #c0d4f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        body.dark-mode .subhead {
-            color: #94a3b8;
-        }
-
-        /* 人员卡片网格 */
-        .people-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            margin: 32px 0 28px;
-        }
-
-        .person-card {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px 18px;
-            border: 1px solid #e9eef2;
-            transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-
-        body.dark-mode .person-card {
-            background: #2d3a4f;
-            border-color: #334155;
-        }
-
-        .person-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
-            font-weight: 600;
-            font-size: 1.3rem;
-            border-bottom: 2px dashed #cbd5e1;
-            padding-bottom: 8px;
-        }
-
-        body.dark-mode .person-header {
-            border-bottom-color: #475569;
-        }
-
-        .person-name {
-            background: #e0e7ff;
-            color: #4338ca;
-            padding: 6px 16px;
+        .settings-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
             border-radius: 40px;
-            font-size: 1.1rem;
-            word-break: break-word; /* 长名字折行 */
-        }
-
-        body.dark-mode .person-name {
-            background: #4f46e5;
-            color: #ffffff;
-        }
-
-        /* 学科行 */
-        .subject-row {
+            padding: 12px 28px;  /* 增大触摸区域 */
+            font-size: 1rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 14px;
-            background: #ffffff;
-            padding: 12px 16px;
-            border-radius: 18px;
-            border: 1px solid #e2e8f0;
-        }
-
-        body.dark-mode .subject-row {
-            background: #1e293b;
-            border-color: #475569;
-        }
-
-        .subject-check {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            min-width: 70px;
-        }
-        .subject-check input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #4f46e5;
+            gap: 8px;
             cursor: pointer;
-            flex-shrink: 0;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            min-height: 48px; /* 确保触摸高度 */
         }
-        .subject-check label {
+        .settings-btn:hover {
+            background-color: #eaf0f9;
+            border-color: #7f9bc0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 30, 60, 0.12);
+        }
+        .settings-btn:active {
+            transform: scale(0.97);
+            transition: transform 0.05s;
+        }
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* 手机更合适 */
+            gap: 20px;
+            margin-bottom: 36px;
+        }
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 18px;
+            box-shadow: 0 15px 30px rgba(0, 20, 40, 0.06);
+            border: 1px solid #e9eef4;
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1), box-shadow 0.3s ease;
+            cursor: default;
+        }
+        .card:active {
+            background-color: #f8faff; /* 触摸反馈 */
+            transform: scale(0.99);
+        }
+        body.dark .card:active {
+            background-color: #252d42;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.3rem;
             font-weight: 600;
-            font-size: 1.05rem;
-            margin: 0;
-            cursor: pointer;
-            color: #1e293b;
-            white-space: nowrap;
+            padding-bottom: 18px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #eef3fa;
         }
-        body.dark-mode .subject-check label {
-            color: #f1f5f9;
+        body.dark .card-header {
+            border-bottom-color: #2e3c58;
         }
-
-        .dimension-selects {
+        .subject-row {
+            margin-bottom: 24px;
+            padding: 8px 0 8px 8px;
+            border-radius: 16px;
+            background: rgba(235, 245, 255, 0.3);
+            transition: background 0.2s;
+        }
+        body.dark .subject-row {
+            background: rgba(30, 45, 80, 0.3);
+        }
+        .subject-header {
             display: flex;
-            flex: 2 1 400px;
-            flex-wrap: wrap;
-            gap: 8px 16px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .subject-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            min-width: 60px;
+            color: #1d3b66;
+        }
+        body.dark .subject-name {
+            color: #b2cef0;
+        }
+        .subject-checkbox {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .subject-checkbox+label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            padding: 8px 18px 8px 14px; /* 增大触摸区域 */
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+            user-select: none;
+            min-height: 44px; /* 触摸高度 */
+        }
+        .subject-checkbox+label::before {
+            content: "☐";
+            font-size: 1.2rem;
+            margin-right: 4px;
+            transition: content 0.1s;
+        }
+        .subject-checkbox:checked+label::before {
+            content: "✅";
+        }
+        .subject-checkbox:checked+label {
+            background: #e1f0fa;
+            border-color: #2f6ea2;
+            color: #0d3e66;
+        }
+        .subject-checkbox+label:active {
+            transform: scale(0.96);
+        }
+        body.dark .subject-checkbox:checked+label {
+            background: #1d4468;
+            border-color: #6190c0;
+            color: #d5e9ff;
         }
 
-        .dim-item {
+        .dimensions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            margin-left: 4px;
+        }
+        .dimension-group {
             display: flex;
             align-items: center;
             gap: 6px;
-            background: #f1f5f9;
-            padding: 4px 12px 4px 8px;
+            flex-wrap: wrap;
+        }
+        .dimension-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #4f658d;
+            min-width: 44px;
+        }
+        body.dark .dimension-label {
+            color: #a5b9da;
+        }
+        .option-group {
+            display: flex;
+            gap: 4px;
+            background: #f2f6fd;
+            padding: 4px;
+            border-radius: 40px;
+            border: 1px solid #dae2ed;
+        }
+        body.dark .option-group {
+            background: #262e45;
+            border-color: #3e5075;
+        }
+        .option-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px; /* 增大触摸区域 */
             border-radius: 30px;
             font-size: 0.9rem;
-            min-width: 140px;  /* 保证最小宽度，避免太窄 */
-            flex: 1 0 auto;
-        }
-        body.dark-mode .dim-item {
-            background: #334155;
-        }
-
-        .dim-item select {
-            border: none;
-            background: transparent;
             font-weight: 500;
-            padding: 6px 4px;
-            font-size: 0.9rem;
-            border-radius: 20px;
-            outline: none;
+            color: #1f2a44;
             cursor: pointer;
-            color: #0f172a;
-            flex: 1;  /* 让select占据剩余宽度 */
-            min-width: 80px;  /* 确保在小屏上可点 */
-        }
-        body.dark-mode .dim-item select {
-            color: #f1f5f9;
-            background-color: #475569;
-        }
-        .dim-item select option {
-            background: white;
-            color: black;
-        }
-        body.dark-mode .dim-item select option {
-            background: #2d3a4f;
-            color: #f1f5f9;
-        }
-
-        .dim-label {
-            font-weight: 500;
-            color: #475569;
+            transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
             white-space: nowrap;
-        }
-        body.dark-mode .dim-label {
-            color: #cbd5e1;
-        }
-
-        /* 按钮组 */
-        .action-bar {
-            display: flex;
-            gap: 16px;
+            border: 1px solid transparent;
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            flex-wrap: wrap;
-            margin: 30px 0 20px;
+        }
+        .option-btn.selected {
+            background: white;
+            border-color: #2f6ea2;
+            box-shadow: 0 2px 8px rgba(0,80,150,0.1);
+            color: #0c4b81;
+            font-weight: 600;
+        }
+        body.dark .option-btn.selected {
+            background: #2f5580;
+            border-color: #7fa9d5;
+            color: white;
+        }
+        .option-btn:active {
+            transform: scale(0.94);
+            background: rgba(70, 130, 200, 0.15);
         }
 
-        .primary-btn {
-            background: #4f46e5;
-            border: none;
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0 30px;
+            flex-wrap: wrap;
+        }
+        .primary-btn, .secondary-btn {
             padding: 14px 36px;
             border-radius: 60px;
             font-weight: 600;
             font-size: 1.1rem;
-            color: white;
-            box-shadow: 0 8px 16px -6px #a5b4fc;
-            transition: 0.2s;
             cursor: pointer;
-            border: 1px solid transparent;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            border: none;
+            box-shadow: 0 10px 20px -5px rgba(20,60,130,0.2);
+            min-height: 56px;
             min-width: 160px;
-            flex: 0 1 auto;
         }
-        .primary-btn:hover {
-            background: #6366f1;
-            transform: translateY(-2px);
-            box-shadow: 0 14px 22px -8px #818cf8;
+        .primary-btn {
+            background: #1d3e6b;
+            color: white;
+        }
+        .primary-btn:active {
+            transform: scale(0.96);
+            background: #0f2e4f;
         }
         .secondary-btn {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            padding: 14px 36px;
-            border-radius: 60px;
-            font-weight: 500;
-            color: #334155;
-            transition: 0.2s;
-            cursor: pointer;
-            min-width: 160px;
-            flex: 0 1 auto;
+            background: white;
+            color: #1f2a44;
+            border: 1px solid #b9cbeb;
+            box-shadow: none;
         }
-        .secondary-btn:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
+        .secondary-btn:active {
+            transform: scale(0.96);
+            background: #d9e4f5;
         }
-        body.dark-mode .secondary-btn {
-            background: #1e293b;
-            color: #f1f5f9;
-            border-color: #64748b;
+        body.dark .secondary-btn {
+            background: #262e45;
+            color: #dfe7f5;
+            border-color: #4e6190;
         }
-        body.dark-mode .secondary-btn:hover {
-            background: #2d3a4f;
+        .report-box {
+            background: #fafdff;
+            border-radius: 32px;
+            padding: 20px;
+            border: 1px solid #d9e4f0;
         }
-
+        body.dark .report-box {
+            background: #1b2133;
+            border-color: #32415e;
+        }
         textarea {
             width: 100%;
-            border-radius: 24px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            padding: 20px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin: 20px 0 10px;
+            padding: 20px 24px;
+            border-radius: 28px;
+            border: 1px solid #d4e0ec;
+            font-family: 'Inter', monospace;
+            font-size: 1rem;
+            line-height: 1.7;
             resize: vertical;
-            color: #1e293b;
-        }
-        body.dark-mode textarea {
-            background: #0f172a;
-            border-color: #334155;
-            color: #e2e8f0;
-        }
-
-        .settings-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             background: white;
-            border: 1px solid #e2e8f0;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            color: #1e293b;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.04);
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            transition: 0.2s;
-            z-index: 100;
-            font-size: 0.95rem;
+            color: #1c293b;
+            outline: none;
+            min-height: 200px;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .settings-button:hover {
-            background: #f1f5f9;
-            transform: scale(1.02);
+        textarea:focus {
+            border-color: #2f6ea2;
+            box-shadow: 0 0 0 3px rgba(47, 110, 162, 0.2);
         }
-        body.dark-mode .settings-button {
-            background: #1e293b;
-            color: #f1f5f9;
-            border-color: #475569;
+        body.dark textarea {
+            background: #1d2338;
+            color: #cdd9f0;
+            border-color: #36496b;
+        }
+        body.dark textarea:focus {
+            border-color: #7fa9d5;
+            box-shadow: 0 0 0 3px rgba(127, 169, 213, 0.3);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: #667c9e;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .footer a {
+            color: #1d4e89;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 8px;
+            display: inline-block;
+        }
+        .footer a:active {
+            opacity: 0.7;
         }
 
-        /* 模态框 */
+        /* 模态框动画 - 从底部滑入 */
         .modal {
             display: none;
             position: fixed;
-            z-index: 200;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(3px);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0);
+            backdrop-filter: blur(0px);
             align-items: center;
             justify-content: center;
-            padding: 12px;
+            z-index: 1000;
+            transition: background 0.3s, backdrop-filter 0.3s;
+        }
+        .modal.show {
+            display: flex;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
         }
         .modal-content {
             background: white;
-            max-width: 460px;
-            width: 100%;
-            border-radius: 36px;
-            padding: 28px;
+            max-width: 550px;
+            width: 90%;
+            border-radius: 48px;
+            padding: 36px 28px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-            animation: modalFade 0.2s;
             max-height: 90vh;
             overflow-y: auto;
+            transform: translateY(30px) scale(0.95);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1), opacity 0.25s ease;
         }
-        body.dark-mode .modal-content {
-            background: #1e293b;
-            border: 1px solid #334155;
+        .modal.show .modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
-        @keyframes modalFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .close {
-            float: right;
-            font-size: 28px;
-            font-weight: 300;
-            cursor: pointer;
-            color: #94a3b8;
-            line-height: 1;
-        }
-        .close:hover { color: #1e293b; }
-        body.dark-mode .close:hover { color: #f1f5f9; }
-
-        .modal-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin: 24px 0;
-        }
-        .modal-input-group input, .modal-input-group select {
-            padding: 14px 18px;
-            border-radius: 30px;
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
-            font-size: 1rem;
-            width: 100%;
-        }
-        body.dark-mode .modal-input-group input,
-        body.dark-mode .modal-input-group select {
-            background: #0f172a;
-            border-color: #475569;
-            color: #f1f5f9;
-        }
-        /* 科目多选样式 */
-        .subject-picker {
-            background: #f1f5f9;
-            border-radius: 28px;
-            padding: 16px 20px;
-            margin-top: 8px;
-        }
-        .subject-picker p {
+        .modal-content h2 {
+            margin-bottom: 20px;
             font-weight: 600;
+        }
+        .input-group {
+            margin-bottom: 24px;
+        }
+        .member-row input {
+            width: 100%;
+            padding: 16px 22px; /* 增大触摸 */
+            border-radius: 50px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
             margin-bottom: 12px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: 56px;
         }
-        .subject-picker label {
-            display: inline-flex;
+        .member-row input:focus {
+            border-color: #2f6ea2;
+            box-shadow: 0 0 0 3px rgba(47, 110, 162, 0.2);
+            outline: none;
+        }
+        .group-select {
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 50px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: 56px;
+            font-size: 1rem;
+        }
+        .group-select:focus {
+            border-color: #2f6ea2;
+            box-shadow: 0 0 0 3px rgba(47, 110, 162, 0.2);
+            outline: none;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .checkbox-group label {
+            display: flex;
             align-items: center;
-            gap: 8px;
-            margin-right: 24px;
+            gap: 10px;
             cursor: pointer;
-            white-space: nowrap; /* 防止换行 */
+            transition: color 0.2s;
+            padding: 8px 0;
+            min-height: 44px;
         }
-        .subject-picker input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #4f46e5;
+        .checkbox-group input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #1d3e6b;
         }
-
-        .footer {
-            text-align: center;
-            margin-top: 28px;
-            font-size: 0.85rem;
-            color: #64748b;
+        .dark-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 28px 0;
+            min-height: 48px;
         }
-        .footer a { color: #4f46e5; text-decoration: none; font-weight: 500; }
-        body.dark-mode .footer a { color: #a5b4fc; }
-
-        /* ========== 响应式增强 (适配各种屏幕) ========== */
-        @media (max-width: 700px) {
-            .container {
-                padding: 22px 18px;
-            }
-            h1 {
-                font-size: 1.9rem;
-            }
+        .save-btn {
+            background: #1d3e6b;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-height: 64px;
         }
-
-        @media (max-width: 600px) {
-            .subject-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .subject-check {
-                margin-bottom: 4px;
-            }
-            .dimension-selects {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .dim-item {
-                width: 100%;
-                justify-content: space-between;
-            }
-            .dim-item select {
-                max-width: 60%;  /* 在非常小的屏幕上给select更多空间 */
-            }
-            .action-bar button {
-                width: 100%;
-                min-width: unset;
-            }
+        .save-btn:active {
+            transform: scale(0.97);
+            background: #0f2e4f;
         }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 8px;
-            }
-            .container {
-                padding: 18px 14px;
-                border-radius: 24px;
-                margin-top: 70px;  /* 为固定设置按钮让出空间 */
-            }
-            h1 {
-                font-size: 1.7rem;
-            }
-            .person-card {
-                padding: 16px 12px;
-            }
-            .person-header {
-                font-size: 1.1rem;
-            }
-            .person-name {
-                font-size: 1rem;
-                padding: 4px 14px;
-            }
-            .subject-check label {
-                font-size: 1rem;
-            }
-            .dim-item {
-                font-size: 0.85rem;
-                padding: 6px 10px;
-            }
-            .dim-item select {
-                font-size: 0.85rem;
-                padding: 5px 2px;
-            }
-            .settings-button {
-                padding: 8px 18px;
-                font-size: 0.9rem;
-                top: 12px;
-                right: 12px;
-            }
-            .modal-content {
-                padding: 20px;
-            }
-            .subject-picker label {
-                white-space: normal;  /* 小屏可换行 */
-                margin-right: 12px;
-                margin-bottom: 6px;
-            }
+        .close-icon {
+            float: right;
+            font-size: 2.4rem;
+            line-height: 1;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #666;
+            transition: color 0.2s, transform 0.2s;
+            padding: 8px;
+            min-width: 56px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        /* 超小屏 (<=360px) */
-        @media (max-width: 360px) {
-            .dim-item {
-                flex-wrap: wrap;
-                gap: 4px;
-            }
-            .dim-label {
-                width: 100%;
-            }
-            .dim-item select {
-                max-width: 100%;
-                width: 100%;
-            }
-            .subject-check label {
-                white-space: normal;
-                word-break: break-word;
-            }
-            .subject-picker label {
-                display: flex;
-                width: 100%;
-                margin-right: 0;
-            }
+        .close-icon:active {
+            transform: rotate(90deg) scale(0.9);
+            color: #000;
+        }
+        body.dark .close-icon {
+            color: #aaa;
+        }
+        body.dark .close-icon:active {
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <button class="settings-button" onclick="openSettingsModal()">⚙️ 设置</button>
-
-    <div class="container">
-        <h1>📋 作业检查 · 自选科目</h1>
-        <div class="subhead">完成程度 · 字体 · 过程完整度 — 每位成员独立勾选需检查的科目</div>
-
-        <!-- 动态渲染的人员卡片会插入这里 -->
-        <div id="peopleContainer" class="people-grid"></div>
-
-        <div class="action-bar">
-            <button class="primary-btn" onclick="generateReport()">📋 生成报告</button>
-            <button class="secondary-btn" onclick="copyReport()">📎 复制报告</button>
-        </div>
-
-        <textarea id="outputText" rows="6" placeholder="报告将显示在这里..." readonly></textarea>
-
-        <div class="footer">
-            ✦ 无际航天 ✦ <a href="https://wjhtkjwz.eu.org/" target="_blank">去博客看看</a>
-        </div>
+<div class="app-container">
+    <div class="header">
+        <h1>📋 小组作业检查</h1>
+        <button class="settings-btn" id="openSettingsBtn">⚙️ 设置</button>
     </div>
 
-    <!-- 设置模态框 (移除组长模式，增加科目多选) -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeSettingsModal()">&times;</span>
-            <h2 style="margin-top: 0;">⚙️ 初始设置</h2>
-            <div class="modal-input-group">
-                <input type="text" id="name1" placeholder="组员1 姓名">
-                <input type="text" id="name2" placeholder="组员2 姓名">
-                <input type="text" id="name3" placeholder="组员3 姓名">
-                <input type="text" id="name4" placeholder="组员4 姓名">
-                <input type="text" id="name5" placeholder="组员5 姓名">
-                <input type="text" id="name6" placeholder="组员6 姓名">
-                <select id="groupSelect">
-                    <option value="1">第1组</option><option value="2">第2组</option><option value="3">第3组</option>
-                    <option value="4">第4组</option><option value="5">第5组</option><option value="6">第6组</option>
-                    <option value="7">第7组</option><option value="8">第8组</option><option value="9">第9组</option>
-                </select>
+    <div id="membersContainer" class="members-grid"></div>
 
-                <!-- 科目多选 (全局) -->
-                <div class="subject-picker">
-                    <p>📌 选择要检查的科目</p>
-                    <label><input type="checkbox" id="subjPhys" value="物理" checked> 物理</label>
-                    <label><input type="checkbox" id="subjChem" value="化学" checked> 化学</label>
-                    <label><input type="checkbox" id="subjBio" value="生物" checked> 生物</label>
-                </div>
-            </div>
-            <label style="display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="darkModeToggle"> 暗黑模式
-            </label>
-            <!-- 已移除组长模式复选框 -->
-            <button class="primary-btn" onclick="saveSettings()" style="width:100%; margin-top:20px;">保存并开始</button>
-        </div>
+    <div class="action-buttons">
+        <button class="primary-btn" id="generateReportBtn">📄 生成报告</button>
+        <button class="secondary-btn" id="copyReportBtn">📋 复制报告</button>
     </div>
 
-    <script>
-        (function() {
-            // ----- 核心数据 & 维度定义 -----
-            const DIMENSIONS = {
-                completion: { label: '完成程度', options: ['完成良好', '未完成', '部分完成'] },
-                font: { label: '字体', options: ['工整', '潦草', '一般'] },
-                process: { label: '过程完整度', options: ['完整', '缺少步骤', '不完整'] }
-            };
+    <div class="report-box">
+        <textarea id="reportText" placeholder="生成的报告会显示在这里……" readonly></textarea>
+    </div>
 
-            const BEST_VALUES = {
-                completion: '完成良好',
-                font: '工整',
-                process: '完整'
-            };
+    <div class="footer">
+        ✦ 无际航天 ✦ 博客 <a href="https://wjhtkjwz.eu.org/" target="_blank">wjhtkjwz.eu.org</a>
+    </div>
+</div>
 
-            // 固定基础科目 (不再使用组长模式)
-            const ALL_SUBJECTS = ['物理', '化学', '生物'];
+<!-- 设置模态框 -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <button class="close-icon" id="closeModalBtn">&times;</button>
+        <h2>⚙️ 配置小组</h2>
+        <div class="input-group">
+            <label>👥 六位组员姓名</label>
+            <div id="memberInputs"></div>
+        </div>
+        <div class="input-group">
+            <label>📌 组别</label>
+            <select id="groupSelect" class="group-select">
+                <option>第1组</option><option>第2组</option><option>第3组</option>
+                <option>第4组</option><option>第5组</option><option>第6组</option>
+                <option>第7组</option><option>第8组</option><option>第9组</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>📚 检查科目 (可多选)</label>
+            <div class="checkbox-group" id="subjectsCheckboxGroup"></div>
+        </div>
+        <div class="dark-switch">
+            <span>🌙 暗黑模式</span>
+            <label><input type="checkbox" id="darkModeCheckbox"> 开启</label>
+        </div>
+        <button class="save-btn" id="saveSettingsBtn">保存并开始</button>
+    </div>
+</div>
 
-            // ----- 获取要显示的科目 (根据本地存储的选中科目) -----
-            function getSelectedSubjects() {
-                const stored = localStorage.getItem('selectedSubjects');
-                if (stored) {
-                    try {
-                        const arr = JSON.parse(stored);
-                        // 过滤掉可能不存在的科目 (但保留有效值)
-                        return arr.filter(s => ALL_SUBJECTS.includes(s));
-                    } catch (e) {
-                        return [...ALL_SUBJECTS]; // 出错时返回全部
-                    }
-                }
-                return [...ALL_SUBJECTS]; // 默认全部
+<script>
+    (function() {
+        const ALL_SUBJECTS = ["语文", "数学", "英语", "物理", "化学", "生物"];
+        const COMPLETION_OPTS = ["完成良好", "未完成", "部分完成"];
+        const FONT_OPTS = ["工整", "潦草", "一般"];
+        const PROCESS_OPTS = ["过程完整", "缺少步骤", "较完整"];
+
+        let settings = {
+            memberNames: ["张一", "李二", "王三", "赵四", "周五", "郑六"],
+            group: "第1组",
+            selectedSubjects: [...ALL_SUBJECTS],
+            darkMode: false
+        };
+
+        let evaluation = [];
+
+        const container = document.getElementById('membersContainer');
+        const modal = document.getElementById('settingsModal');
+        const openBtn = document.getElementById('openSettingsBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const saveBtn = document.getElementById('saveSettingsBtn');
+        const memberInputsDiv = document.getElementById('memberInputs');
+        const groupSelect = document.getElementById('groupSelect');
+        const subjectsDiv = document.getElementById('subjectsCheckboxGroup');
+        const darkCheck = document.getElementById('darkModeCheckbox');
+        const generateBtn = document.getElementById('generateReportBtn');
+        const copyBtn = document.getElementById('copyReportBtn');
+        const reportText = document.getElementById('reportText');
+
+        function formatDate() {
+            const d = new Date();
+            return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function createDefaultEvaluation() {
+            const subjLen = settings.selectedSubjects.length;
+            return settings.memberNames.map(() => 
+                Array.from({ length: subjLen }, () => ({
+                    checked: true,
+                    completion: "完成良好",
+                    font: "工整",
+                    process: "过程完整"
+                }))
+            );
+        }
+
+        function persistAll() {
+            localStorage.setItem('groupSettings', JSON.stringify(settings));
+            localStorage.setItem('groupEvaluation', JSON.stringify(evaluation));
+        }
+
+        function loadFromStorage() {
+            const savedSettings = localStorage.getItem('groupSettings');
+            if (savedSettings) {
+                settings = JSON.parse(savedSettings);
             }
-
-            // ----- 渲染人员卡片 (基于选中的科目) -----
-            function renderPeople() {
-                const container = document.getElementById('peopleContainer');
-                if (!container) return;
-                
-                const savedNames = JSON.parse(localStorage.getItem('names')) || ['1', '2', '3', '4', '5', '6'];
-                const subjects = getSelectedSubjects();   // 仅显示用户勾选的科目
-
-                let html = '';
-                for (let p = 0; p < 6; p++) {
-                    const personName = savedNames[p] || (p+1).toString();
-                    html += `<div class="person-card" data-person-index="${p}">`;
-                    html += `<div class="person-header"><span class="person-name">👤 ${personName}</span></div>`;
-
-                    subjects.forEach((subject, subjIdx) => {
-                        html += `<div class="subject-row" data-subject="${subject}">`;
-                        // 个人级别复选框 (默认勾选，表示该成员此科目参与报告)
-                        html += `<div class="subject-check">`;
-                        html += `<input type="checkbox" class="subject-checkbox" id="chk_${p}_${subjIdx}" checked>`;
-                        html += `<label for="chk_${p}_${subjIdx}">${subject}</label>`;
-                        html += `</div>`;
-
-                        // 三个维度下拉
-                        html += `<div class="dimension-selects">`;
-                        // 完成程度
-                        html += `<div class="dim-item"><span class="dim-label">完成</span>`;
-                        html += `<select class="dim-completion" data-dim="completion">`;
-                        DIMENSIONS.completion.options.forEach(opt => html += `<option value="${opt}">${opt}</option>`);
-                        html += `</select></div>`;
-                        // 字体
-                        html += `<div class="dim-item"><span class="dim-label">字体</span>`;
-                        html += `<select class="dim-font" data-dim="font">`;
-                        DIMENSIONS.font.options.forEach(opt => html += `<option value="${opt}">${opt}</option>`);
-                        html += `</select></div>`;
-                        // 过程完整度
-                        html += `<div class="dim-item"><span class="dim-label">过程</span>`;
-                        html += `<select class="dim-process" data-dim="process">`;
-                        DIMENSIONS.process.options.forEach(opt => html += `<option value="${opt}">${opt}</option>`);
-                        html += `</select></div>`;
-                        html += `</div>`; // dimension-selects
-                        html += `</div>`; // subject-row
-                    });
-                    html += `</div>`; // person-card
-                }
-                container.innerHTML = html;
+            if (!settings.selectedSubjects || settings.selectedSubjects.length === 0) {
+                settings.selectedSubjects = [...ALL_SUBJECTS];
             }
-
-            // ----- 生成报告 (基于全局选中科目 + 个人勾选) -----
-            function generateReport() {
-                const subjects = getSelectedSubjects();  // 全局显示的科目
-                const savedNames = JSON.parse(localStorage.getItem('names')) || ['1', '2', '3', '4', '5', '6'];
-                const group = JSON.parse(localStorage.getItem('group')) || '1';
-
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
-
-                // 存储每个科目的问题列表
-                const subjectIssues = {};
-                subjects.forEach(s => subjectIssues[s] = []);
-
-                const cards = document.querySelectorAll('.person-card');
-                cards.forEach((card, personIdx) => {
-                    const personName = savedNames[personIdx] || (personIdx+1).toString();
-                    const rows = card.querySelectorAll('.subject-row');
-                    
-                    rows.forEach((row) => {
-                        const chk = row.querySelector('.subject-checkbox');
-                        if (!chk || !chk.checked) return; // 个人未勾选此科目
-
-                        // 获取科目名称 (从 data-subject 或行内文本)
-                        let subject = row.dataset.subject;
-                        if (!subject) {
-                            // 后备：从label获取
-                            const label = row.querySelector('.subject-check label');
-                            subject = label ? label.innerText.trim() : '';
-                        }
-                        if (!subject || !subjects.includes(subject)) return; // 安全过滤
-
-                        const completion = row.querySelector('.dim-completion')?.value || '';
-                        const font = row.querySelector('.dim-font')?.value || '';
-                        const process = row.querySelector('.dim-process')?.value || '';
-
-                        const isAllBest = (completion === BEST_VALUES.completion && 
-                                           font === BEST_VALUES.font && 
-                                           process === BEST_VALUES.process);
-
-                        if (!isAllBest) {
-                            const faults = [];
-                            if (completion !== BEST_VALUES.completion) faults.push(`完成:${completion}`);
-                            if (font !== BEST_VALUES.font) faults.push(`字体:${font}`);
-                            if (process !== BEST_VALUES.process) faults.push(`过程:${process}`);
-                            const detail = faults.join('; ');
-                            subjectIssues[subject].push(`${personName} (${detail})`);
-                        }
-                    });
-                });
-
-                let output = `第${group}组 ${dateStr} 作业完成情况\n`;
-                subjects.forEach(subject => {
-                    const issues = subjectIssues[subject];
-                    if (issues.length === 0) {
-                        output += `${subject}：全员良好\n`;
+            const savedEval = localStorage.getItem('groupEvaluation');
+            if (savedEval) {
+                try {
+                    const parsed = JSON.parse(savedEval);
+                    if (parsed.length === settings.memberNames.length && 
+                        parsed[0]?.length === settings.selectedSubjects.length) {
+                        evaluation = parsed;
                     } else {
-                        output += `${subject}：${issues.join('； ')}\n`;
+                        evaluation = createDefaultEvaluation();
                     }
-                });
+                } catch { evaluation = createDefaultEvaluation(); }
+            } else {
+                evaluation = createDefaultEvaluation();
+            }
+            applyDarkMode(settings.darkMode);
+        }
 
-                const outputEl = document.getElementById('outputText');
-                if (outputEl) outputEl.value = output;
+        function applyDarkMode(enable) {
+            document.body.classList.toggle('dark', enable);
+            if (darkCheck) darkCheck.checked = enable;
+        }
+
+        function renderCards() {
+            const subjList = settings.selectedSubjects;
+            const memberNames = settings.memberNames;
+            let html = '';
+
+            for (let mIdx = 0; mIdx < memberNames.length; mIdx++) {
+                const name = memberNames[mIdx] || `成员${mIdx+1}`;
+                html += `<div class="card" data-member="${mIdx}">`;
+                html += `<div class="card-header"><span>👤</span> ${name}</div>`;
+
+                for (let sIdx = 0; sIdx < subjList.length; sIdx++) {
+                    const subject = subjList[sIdx];
+                    const evalItem = evaluation[mIdx]?.[sIdx] || { checked: true, completion: '完成良好', font: '工整', process: '过程完整' };
+                    const checkedAttr = evalItem.checked ? 'checked' : '';
+
+                    html += `<div class="subject-row" data-subject="${sIdx}">`;
+                    html += `<div class="subject-header">`;
+                    html += `<span class="subject-name">${subject}</span>`;
+                    html += `<input type="checkbox" class="subject-checkbox" id="chk_${mIdx}_${sIdx}" data-member="${mIdx}" data-subject="${sIdx}" ${checkedAttr}>`;
+                    html += `<label for="chk_${mIdx}_${sIdx}">计入报告</label>`;
+                    html += `</div>`;
+
+                    html += `<div class="dimensions">`;
+                    // 完成程度
+                    html += `<div class="dimension-group">`;
+                    html += `<span class="dimension-label">完成</span>`;
+                    html += `<div class="option-group" data-dim="completion">`;
+                    COMPLETION_OPTS.forEach(opt => {
+                        const selected = (opt === evalItem.completion) ? 'selected' : '';
+                        html += `<button class="option-btn ${selected}" data-value="${opt}">${opt}</button>`;
+                    });
+                    html += `</div></div>`;
+
+                    // 字体
+                    html += `<div class="dimension-group">`;
+                    html += `<span class="dimension-label">字体</span>`;
+                    html += `<div class="option-group" data-dim="font">`;
+                    FONT_OPTS.forEach(opt => {
+                        const selected = (opt === evalItem.font) ? 'selected' : '';
+                        html += `<button class="option-btn ${selected}" data-value="${opt}">${opt}</button>`;
+                    });
+                    html += `</div></div>`;
+
+                    // 过程
+                    html += `<div class="dimension-group">`;
+                    html += `<span class="dimension-label">过程</span>`;
+                    html += `<div class="option-group" data-dim="process">`;
+                    PROCESS_OPTS.forEach(opt => {
+                        const selected = (opt === evalItem.process) ? 'selected' : '';
+                        html += `<button class="option-btn ${selected}" data-value="${opt}">${opt}</button>`;
+                    });
+                    html += `</div></div>`;
+                    html += `</div>`; // .dimensions
+                    html += `</div>`; // .subject-row
+                }
+                html += `</div>`; // .card
+            }
+            container.innerHTML = html;
+        }
+
+        container.addEventListener('click', (e) => {
+            const btn = e.target.closest('.option-btn');
+            if (btn) {
+                e.preventDefault();
+                const groupDiv = btn.closest('.option-group');
+                if (!groupDiv) return;
+                const dim = groupDiv.dataset.dim;
+                const subjectRow = btn.closest('.subject-row');
+                const card = btn.closest('.card');
+                if (!subjectRow || !card) return;
+                const memberIdx = card.dataset.member;
+                const subjectIdx = subjectRow.dataset.subject;
+                if (memberIdx === undefined || subjectIdx === undefined) return;
+                const m = parseInt(memberIdx);
+                const s = parseInt(subjectIdx);
+                const value = btn.dataset.value;
+
+                groupDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+
+                if (!evaluation[m]) evaluation[m] = [];
+                if (!evaluation[m][s]) evaluation[m][s] = {};
+                evaluation[m][s][dim] = value;
+                persistAll();
+                return;
             }
 
-            function copyReport() {
-                const output = document.getElementById('outputText');
-                if (!output.value.trim()) {
-                    alert('还没有生成报告，请先点击“生成报告”');
-                    return;
+            const chk = e.target.closest('.subject-checkbox');
+            if (chk) {
+                // handled by change
+            }
+        });
+
+        container.addEventListener('change', (e) => {
+            const chk = e.target.closest('.subject-checkbox');
+            if (!chk) return;
+            const memberIdx = chk.dataset.member;
+            const subjectIdx = chk.dataset.subject;
+            if (memberIdx === undefined || subjectIdx === undefined) return;
+            const m = parseInt(memberIdx);
+            const s = parseInt(subjectIdx);
+            if (!evaluation[m]) evaluation[m] = [];
+            if (!evaluation[m][s]) evaluation[m][s] = {};
+            evaluation[m][s].checked = chk.checked;
+            persistAll();
+        });
+
+        function generateReport() {
+            const subjList = settings.selectedSubjects;
+            const memberNames = settings.memberNames;
+            const group = settings.group;
+            const now = new Date();
+            const year = 2026;
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            let report = `${group}${year}年${month}月${day}日作业检查情况\n\n`;
+
+            for (let sIdx = 0; sIdx < subjList.length; sIdx++) {
+                const subject = subjList[sIdx];
+                const lines = [];
+                let hasAnyChecked = false;
+
+                for (let mIdx = 0; mIdx < memberNames.length; mIdx++) {
+                    const evalItem = evaluation[mIdx]?.[sIdx];
+                    if (!evalItem || !evalItem.checked) continue;
+                    hasAnyChecked = true;
+                    const name = memberNames[mIdx];
+                    const completion = evalItem.completion || '完成良好';
+                    const font = evalItem.font || '工整';
+                    const process = evalItem.process || '过程完整';
+                    lines.push(`${name}：${completion}，字体${font}，过程${process}`);
                 }
-                output.select();
-                output.setSelectionRange(0, 99999);
-                document.execCommand('copy');
+
+                if (!hasAnyChecked) continue;
+                report += `${subject}：\n`;
+                lines.forEach(line => { report += `${line}\n`; });
+                report += `\n`;
+            }
+            reportText.value = report.trim();
+        }
+
+        async function copyReport() {
+            if (!reportText.value) return alert('没有报告可复制');
+            try {
+                await navigator.clipboard.writeText(reportText.value);
                 alert('报告已复制到剪贴板');
+            } catch {
+                alert('复制失败，请手动选择复制');
             }
+        }
 
-            // ----- 设置相关 -----
-            function openSettingsModal() {
-                // 填充姓名
-                const savedNames = JSON.parse(localStorage.getItem('names')) || ['1', '2', '3', '4', '5', '6'];
-                for (let i=1; i<=6; i++) {
-                    const input = document.getElementById(`name${i}`);
-                    if (input) input.value = savedNames[i-1];
-                }
-
-                // 组别
-                const group = JSON.parse(localStorage.getItem('group')) || '1';
-                const groupSelect = document.getElementById('groupSelect');
-                if (groupSelect) groupSelect.value = group;
-
-                // 暗黑模式
-                const dark = JSON.parse(localStorage.getItem('darkMode')) || false;
-                document.getElementById('darkModeToggle').checked = dark;
-
-                // 科目复选框：从 localStorage 读取选中科目，默认全选
-                const selected = getSelectedSubjects();  // 返回数组
-                document.getElementById('subjPhys').checked = selected.includes('物理');
-                document.getElementById('subjChem').checked = selected.includes('化学');
-                document.getElementById('subjBio').checked = selected.includes('生物');
-
-                document.getElementById('settingsModal').style.display = 'flex';
+        function populateModal() {
+            let memberHtml = '';
+            for (let i = 0; i < 6; i++) {
+                const val = settings.memberNames[i] || '';
+                memberHtml += `<div class="member-row"><input type="text" placeholder="组员${i+1}" value="${val.replace(/"/g, '&quot;')}"></div>`;
             }
-
-            function closeSettingsModal() {
-                document.getElementById('settingsModal').style.display = 'none';
-            }
-
-            function saveSettings() {
-                // 保存姓名
-                const names = [];
-                for (let i=1; i<=6; i++) {
-                    names.push(document.getElementById(`name${i}`).value.trim() || (i).toString());
-                }
-                localStorage.setItem('names', JSON.stringify(names));
-
-                // 组别
-                const group = document.getElementById('groupSelect').value;
-                localStorage.setItem('group', JSON.stringify(group));
-
-                // 暗黑模式
-                const dark = document.getElementById('darkModeToggle').checked;
-                localStorage.setItem('darkMode', JSON.stringify(dark));
-                applyDarkMode(dark);
-
-                // 保存选中的科目
-                const selectedSubjects = [];
-                if (document.getElementById('subjPhys').checked) selectedSubjects.push('物理');
-                if (document.getElementById('subjChem').checked) selectedSubjects.push('化学');
-                if (document.getElementById('subjBio').checked) selectedSubjects.push('生物');
-                // 如果啥都没选，给个默认物理 (避免空界面)
-                if (selectedSubjects.length === 0) selectedSubjects.push('物理');
-                localStorage.setItem('selectedSubjects', JSON.stringify(selectedSubjects));
-
-                // 重新渲染卡片 (根据新科目)
-                renderPeople();
-
-                closeSettingsModal();
-                // 不自动弹alert，避免干扰
-            }
-
-            function applyDarkMode(enabled) {
-                if (enabled) document.body.classList.add('dark-mode');
-                else document.body.classList.remove('dark-mode');
-            }
-
-            // 初始化：如果从未设置过科目（第一次访问），自动打开设置模态框
-            function firstTimeSetup() {
-                // 检查是否已有任何用户设置 (可以检测selectedSubjects)
-                const hasSubjects = localStorage.getItem('selectedSubjects') !== null;
-                // 同时检测是否有姓名 (可选)
-                if (!hasSubjects) {
-                    // 首次访问，自动打开设置框
-                    setTimeout(() => {
-                        openSettingsModal();
-                    }, 100); // 略微延迟确保DOM加载
-                }
-                // 无论如何都渲染一次
-                renderPeople();
-            }
-
-            // 页面加载
-            window.addEventListener('load', function() {
-                // 默认值初始化 (防止缺失)
-                if (!localStorage.getItem('names')) {
-                    localStorage.setItem('names', JSON.stringify(['1', '2', '3', '4', '5', '6']));
-                }
-                if (!localStorage.getItem('group')) {
-                    localStorage.setItem('group', JSON.stringify('1'));
-                }
-                if (!localStorage.getItem('darkMode')) {
-                    localStorage.setItem('darkMode', JSON.stringify(false));
-                }
-                // selectedSubjects 不在这里预设，留给 firstTimeSetup 判断
-
-                const dark = JSON.parse(localStorage.getItem('darkMode'));
-                applyDarkMode(dark);
-
-                firstTimeSetup();
-                document.getElementById('outputText').value = '';
+            memberInputsDiv.innerHTML = memberHtml;
+            groupSelect.value = settings.group;
+            let subjectsHtml = '';
+            ALL_SUBJECTS.forEach(sub => {
+                const checked = settings.selectedSubjects.includes(sub) ? 'checked' : '';
+                subjectsHtml += `<label><input type="checkbox" value="${sub}" ${checked}> ${sub}</label>`;
             });
+            subjectsDiv.innerHTML = subjectsHtml;
+            darkCheck.checked = settings.darkMode;
+        }
 
-            // 暴露全局函数
-            window.generateReport = generateReport;
-            window.copyReport = copyReport;
-            window.openSettingsModal = openSettingsModal;
-            window.closeSettingsModal = closeSettingsModal;
-            window.saveSettings = saveSettings;
-        })();
-    </script>
+        function collectAndSaveSettings() {
+            const nameInputs = document.querySelectorAll('#memberInputs input');
+            const newNames = [];
+            nameInputs.forEach(input => newNames.push(input.value.trim() || `成员${newNames.length+1}`));
+
+            const newGroup = groupSelect.value;
+
+            const subjChecks = document.querySelectorAll('#subjectsCheckboxGroup input[type="checkbox"]');
+            const newSelectedSubjects = [];
+            subjChecks.forEach(cb => { if (cb.checked) newSelectedSubjects.push(cb.value); });
+            if (newSelectedSubjects.length === 0) {
+                alert('请至少选择一个科目');
+                return false;
+            }
+
+            const newDark = darkCheck.checked;
+
+            const oldSettings = { ...settings };
+            if (oldSettings.memberNames.join(',') !== newNames.join(',') || 
+                oldSettings.selectedSubjects.join(',') !== newSelectedSubjects.join(',')) {
+                settings.memberNames = newNames;
+                settings.selectedSubjects = newSelectedSubjects;
+                evaluation = createDefaultEvaluation();
+            } else {
+                settings.memberNames = newNames;
+                settings.selectedSubjects = newSelectedSubjects;
+            }
+            settings.group = newGroup;
+            settings.darkMode = newDark;
+
+            applyDarkMode(newDark);
+            persistAll();
+            renderCards();
+            return true;
+        }
+
+        openBtn.addEventListener('click', () => {
+            populateModal();
+            modal.classList.add('show');
+        });
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('show');
+        });
+        saveBtn.addEventListener('click', () => {
+            if (collectAndSaveSettings()) modal.classList.remove('show');
+        });
+        generateBtn.addEventListener('click', generateReport);
+        copyBtn.addEventListener('click', copyReport);
+
+        function init() {
+            loadFromStorage();
+            renderCards();
+            if (!localStorage.getItem('groupSettings')) {
+                populateModal();
+                modal.classList.add('show');
+            }
+        }
+        init();
+    })();
+</script>
 </body>
 </html>
