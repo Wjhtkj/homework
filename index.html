@@ -12,7 +12,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* 去除移动端默认灰色高亮 */
+            -webkit-tap-highlight-color: transparent;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -81,7 +81,7 @@
             background: white;
             border: 1px solid #cbd5e1;
             border-radius: 40px;
-            padding: 12px 28px;  /* 增大触摸区域 */
+            padding: 12px 28px;
             font-size: 1rem;
             font-weight: 500;
             display: flex;
@@ -90,7 +90,7 @@
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            min-height: 48px; /* 确保触摸高度 */
+            min-height: 48px;
         }
         .settings-btn:hover {
             background-color: #eaf0f9;
@@ -104,7 +104,7 @@
         }
         .members-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* 手机更合适 */
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
             margin-bottom: 36px;
         }
@@ -118,7 +118,7 @@
             cursor: default;
         }
         .card:active {
-            background-color: #f8faff; /* 触摸反馈 */
+            background-color: #f8faff;
             transform: scale(0.99);
         }
         body.dark .card:active {
@@ -175,13 +175,13 @@
             background: white;
             border: 1px solid #cbd5e1;
             border-radius: 30px;
-            padding: 8px 18px 8px 14px; /* 增大触摸区域 */
+            padding: 8px 18px 8px 14px;
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s, transform 0.1s;
             user-select: none;
-            min-height: 44px; /* 触摸高度 */
+            min-height: 44px;
         }
         .subject-checkbox+label::before {
             content: "☐";
@@ -244,7 +244,7 @@
         .option-btn {
             background: transparent;
             border: none;
-            padding: 8px 16px; /* 增大触摸区域 */
+            padding: 8px 16px;
             border-radius: 30px;
             font-size: 0.9rem;
             font-weight: 500;
@@ -418,7 +418,7 @@
         }
         .member-row input {
             width: 100%;
-            padding: 16px 22px; /* 增大触摸 */
+            padding: 16px 22px;
             border-radius: 50px;
             border: 1px solid #cbd5e1;
             font-size: 1rem;
@@ -553,9 +553,15 @@
         <div class="input-group">
             <label>📌 组别</label>
             <select id="groupSelect" class="group-select">
-                <option>第1组</option><option>第2组</option><option>第3组</option>
-                <option>第4组</option><option>第5组</option><option>第6组</option>
-                <option>第7组</option><option>第8组</option><option>第9组</option>
+                <option>第1组</option>
+                <option>第2组</option>
+                <option>第3组</option>
+                <option>第4组</option>
+                <option>第5组</option>
+                <option>第6组</option>
+                <option>第7组</option>
+                <option>第8组</option>
+                <!-- 已移除第9组 -->
             </select>
         </div>
         <div class="input-group">
