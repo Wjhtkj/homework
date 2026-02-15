@@ -516,6 +516,95 @@
         body.dark .close-icon:active {
             color: #fff;
         }
+
+        /* ---------- 小屏幕优化 (≤480px) ---------- */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .card {
+                padding: 18px 12px;
+            }
+            .subject-row {
+                padding: 6px 0 6px 4px;
+                margin-bottom: 18px;
+            }
+            .subject-header {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .subject-name {
+                min-width: auto;
+                font-size: 1rem;
+            }
+            .subject-checkbox+label {
+                padding: 6px 12px 6px 10px;
+                font-size: 0.85rem;
+                min-height: 40px;
+            }
+            .dimensions {
+                flex-direction: column;
+                gap: 10px;
+                margin-left: 0;
+            }
+            .dimension-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .dimension-label {
+                min-width: 40px;
+                font-size: 0.75rem;
+            }
+            .option-group {
+                flex: 1;
+                justify-content: space-around;
+            }
+            .option-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+                min-height: 38px;
+                min-width: 38px;
+            }
+            .action-buttons {
+                gap: 12px;
+            }
+            .primary-btn, .secondary-btn {
+                padding: 12px 24px;
+                font-size: 1rem;
+                min-width: 140px;
+                min-height: 48px;
+            }
+            .report-box {
+                padding: 14px;
+            }
+            textarea {
+                padding: 16px 18px;
+                font-size: 0.9rem;
+            }
+            .footer {
+                margin-top: 40px;
+                font-size: 0.9rem;
+            }
+            .modal-content {
+                padding: 28px 20px;
+            }
+            .member-row input {
+                padding: 14px 18px;
+                min-height: 50px;
+            }
+            .group-select {
+                padding: 14px 18px;
+                min-height: 50px;
+            }
+            .save-btn {
+                padding: 16px;
+                font-size: 1.1rem;
+                min-height: 56px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -561,7 +650,6 @@
                 <option>第6组</option>
                 <option>第7组</option>
                 <option>第8组</option>
-                <!-- 已移除第9组 -->
             </select>
         </div>
         <div class="input-group">
